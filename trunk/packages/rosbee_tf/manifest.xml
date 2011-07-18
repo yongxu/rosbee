@@ -1,0 +1,17 @@
+<package>
+  <description brief="rosbee_tf">
+
+     rosbee_tf
+
+  </description>
+  <author>Mechatronica</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rosbee_tf</url>
+  <depend package="roscpp"/>
+  <depend package="rosmsg"/>
+  <depend package="rosbee_control"/>
+
+</package>
+
+
