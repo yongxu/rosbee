@@ -2,12 +2,13 @@
  * platform.hpp
  *
  *  Created on: Jul 18, 2011
- *      Author: Bram van de Klundert
+ *  Author: Bram van de Klundert
  */
 
 #include <string>
-#include <rlserial.h>
-#include <control_commands.h>
+#include <sstream>
+#include <rosbee_control/rlserial.h>
+#include <rosbee_control/control_commands.h>
 
 #define BAUTRATE B115200
 #define TIMEOUT -1
@@ -19,36 +20,46 @@ class Platform {
 public:
 	~Platform();
 
-	Platform getInstance();
+	static Platform* getInstance();
 
-	/*** platform control ***/
+	/*** PLATFORM CONTROL ***/
+	//move the platform
 	void move(int8_t speed,int8_t dir);
+	//enables/disables movement on the robot
 	void Enable_motion(bool enable);
+	//enables/disables pc controll
 	void pc_control(bool enable);
+	//clears the current error
 	void clear_error();
+	//enables/disables ultrasoon sensors
 	void set_ultrasoon(bool enable);
 	//returns an array with a size of 2 which contains the encoder values
-	int16_t* read_encoders();
+	void read_encoders(int16_t* encoders);
 	//returns an array with the ultrasoon distance.
-	int* read_ultrasoon();
+	void read_ultrasoon(int* ultrasoon);
+	//reads the current status of the robot
 	void read_status();
-	/*** end platform control ***/
+	/*** END PLATFORM CONTROL ***/
 
+	//connects to the robot on device
 	bool connect(char* device);
 
 private:
 	Platform();
-	static Platform Pinstance = NULL;
+	static Platform* Pinstance;
 
+	//writes message with size size to the platform
 	bool write_to_platform(char* message,int size);
+	//reads at most size chars from the platform.
 	bool read_from_platform(char* buffer,int size);
 
 	rlSerial serialcon;
 
 	/*** platform settings ***/
 	bool motion_enabled;
-	bool pc_control;
-	bool ultrasoon;
+	bool pc_control_enabled;
+	bool ultrasoon_enable;
+	int ussensor[10];
 	/*** end platform settings ***/
 
 	bool connected;
