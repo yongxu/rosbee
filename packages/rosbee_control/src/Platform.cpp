@@ -2,10 +2,12 @@
  * Platform.cpp
  *
  *  Created on: Jul 18, 2011
- *      Author: ros
+ *  Author: Bram van de Klundert
  */
 
 #include <rosbee_control/Platform.h>
+
+Platform* Platform::Pinstance=NULL;
 
 Platform::Platform()
 {
@@ -17,7 +19,7 @@ Platform::~Platform()
 	if(connected) serialcon.closeDevice();
 }
 
-Platform Platform::getInstance()
+Platform* Platform::getInstance()
 {
 	if(Pinstance == NULL)
 	{
@@ -41,29 +43,150 @@ bool Platform::connect(char* device)
 void Platform::move(int8_t speed,int8_t dir)
 {
 	//no need to move if the motion on the platform is disabled
-	if(motion_enabled) return;
+	if(!motion_enabled || !connected) return;
 	static int count = 0;
 
 	stringstream ss;
 
-	ss << "PC$" << MOVE_CMD << ',' << count << ',' << speed << ',' << dir << ",#";
+	ss << MOVE_CMD << ',' << count << ',' << speed << ',' << dir;
 
-	write_to_platform(ss.str().c_str(),ss.str().length());
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
 
 	count ++;
 }
 
-void Platform::Enable_motion(bool enable);
+void Platform::Enable_motion(bool enable)
+{
+	if(!connected) return;
+	stringstream ss;
+	motion_enabled = enable;
 
-void Platform::pc_control(bool enable);
+	ss << ENABLE_MOTION;
+	if(enable) ss << 1;
+	else ss << 0;
 
-void Platform::clear_error();
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+}
 
-void Platform::set_ultrasoon(bool enable);
+void Platform::pc_control(bool enable)
+{
+	if(!connected) return;
+	stringstream ss;
 
-int16_t* Platform::read_encoders();
+	ss << ENABLE_PC;
+	if(enable) ss << 1;
+	else ss << 0;
 
-int* Platform::read_ultrasoon();
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+}
 
-void Platform::read_status();
+void Platform::clear_error()
+{
+	if(!connected) return;
+	stringstream ss;
+	ss << CLEAR_ERROR;
+
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+}
+
+void Platform::set_ultrasoon(bool enable)
+{
+	if(!connected) return;
+	stringstream ss;
+
+	ss << TOGGLE_US;
+	if(enable) ss << 1;
+	else ss << 0;
+
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+}
+
+void Platform::read_encoders(int16_t* encoders)
+{
+	if(!connected) return;
+	stringstream ss;
+	ss << READ_ENCODERS;
+
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+
+	char buffer[50];
+	bzero(buffer,50);
+
+	if(!read_from_platform(buffer,50)) return;
+	//write code to get both encoder values.
+}
+
+void Platform::read_ultrasoon(int* ultrasoon)
+{
+	if(!connected || ultrasoon_enable) return;
+	stringstream ss;
+	ss << READ_US;
+
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+
+	char buffer[50];
+	bzero(buffer,50);
+
+	if(!read_from_platform(buffer,50)) return;
+	//write code to get all 10 ultrasoon values
+}
+
+void Platform::read_status()
+{
+	if(!connected)return;
+	stringstream ss;
+	ss << READ_STATUS;
+
+	char writestring[ss.str().length()];
+	strcpy(writestring,ss.str().c_str());
+	if(!write_to_platform(writestring,ss.str().length())) return;
+
+	char buffer[50];
+	bzero(buffer,50);
+
+	if(!read_from_platform(buffer,50)) return;
+	//set parameters
+}
 /*** end platform control ***/
+
+bool Platform::write_to_platform(char* message,int size)
+{
+	//check if we are connected to the platform
+	if(!connected)return false;
+
+	//add "pc$" to the start and a "#\0" to the end
+	char tmpmsg[size+5];
+	strcpy(tmpmsg,"PC$");
+	strcpy(tmpmsg+3,message);
+	tmpmsg[size-1] = '#';
+	tmpmsg[size] = 0;
+
+	//write to the platform
+	if(serialcon.writeBlock((unsigned char*)tmpmsg,size+5)<0) return false;
+	return true;
+}
+
+bool Platform::read_from_platform(char* buffer, int size)
+{
+	//check if we are connected to the platform
+	if(!connected)return false;
+
+	//read from the platform
+	/*TODO rewrite with solution to xbees lack of a buffer*/
+	if(serialcon.readBlock((unsigned char*)buffer,size,TIMEOUT)<0)return false;
+	return true;
+}

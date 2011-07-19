@@ -33,7 +33,7 @@ int main(  )
 {
         int i = 0;
         itsPlatform = Platform::getInstance();
-        itsPlatform -> get_Rwheelposition();
+        /*itsPlatform -> get_Rwheelposition();
         sleep(0.5);
         itsPlatform -> get_Rwheelposition();
         sleep(0.5);
@@ -47,7 +47,7 @@ int main(  )
         sleep(0.5);
         itsPlatform -> Move(0,50,0);
         sleep(2);
-        itsPlatform -> get_Rwheelposition();
+        itsPlatform -> get_Rwheelposition();*/
 
 
 
