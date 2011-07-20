@@ -9,9 +9,11 @@
 #include <sstream>
 #include <rosbee_control/rlserial.h>
 #include <rosbee_control/control_commands.h>
+#include <serial_port/lightweightserial.h>
 
 #define BAUTRATE B115200
 #define TIMEOUT -1
+#define NR_ULTRASOON 10
 
 using namespace std;
 
@@ -42,7 +44,7 @@ public:
 	/*** END PLATFORM CONTROL ***/
 
 	//connects to the robot on device
-	bool connect(char* device);
+	bool connect(const char* device);
 
 private:
 	Platform();
@@ -53,13 +55,14 @@ private:
 	//reads at most size chars from the platform.
 	bool read_from_platform(char* buffer,int size);
 
-	rlSerial serialcon;
+	LightweightSerial *lwserialcon;
 
 	/*** platform settings ***/
 	bool motion_enabled;
 	bool pc_control_enabled;
 	bool ultrasoon_enable;
 	int ussensor[10];
+	int16_t encoders[2];
 	/*** end platform settings ***/
 
 	bool connected;

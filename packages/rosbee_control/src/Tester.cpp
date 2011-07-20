@@ -24,34 +24,21 @@
 #include "rosbee_control/Platform.h"
 #include <string>
 #include <iostream>
+#include "ros/ros.h"
 
 using namespace std;
 
 Platform* itsPlatform;
 
-int main(  )
+int main(int argc, char** argv)
 {
-        int i = 0;
-        itsPlatform = Platform::getInstance();
-        /*itsPlatform -> get_Rwheelposition();
-        sleep(0.5);
-        itsPlatform -> get_Rwheelposition();
-        sleep(0.5);
-        itsPlatform -> Enable_motion(true);
-        sleep(0.5);
- //       itsPlatform -> get_Rwheelposition();
-        sleep(0.5);
-        itsPlatform -> Enable_control(true);
-        sleep(0.5);
-        itsPlatform -> get_Rwheelposition();
-        sleep(0.5);
-        itsPlatform -> Move(0,50,0);
-        sleep(2);
-        itsPlatform -> get_Rwheelposition();*/
+	//init ros stuff
+	ros::init(argc,argv,"tester");
+	ros::NodeHandle n;
 
+	itsPlatform = Platform::getInstance();
 
-
-        
+	itsPlatform->connect("/dev/ttyUSB0");
 
 }
 
