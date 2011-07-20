@@ -10,10 +10,12 @@
 #include <rosbee_control/rlserial.h>
 #include <rosbee_control/control_commands.h>
 #include <serial_port/lightweightserial.h>
+#include <ros/ros.h>
 
 #define BAUTRATE B115200
 #define TIMEOUT -1
 #define NR_ULTRASOON 10
+#define NR_ENCODER 2
 
 using namespace std;
 
@@ -63,7 +65,10 @@ private:
 	bool ultrasoon_enable;
 	int ussensor[10];
 	int16_t encoders[2];
+	//query status vars.
+	int Movemode,Lastalarm,Xbeetime,Ppcgetcntr,Platenable,Pcenable,Pfstatus,Maincntr,Safetycntr,Version;
 	/*** end platform settings ***/
+
 
 	bool connected;
 
