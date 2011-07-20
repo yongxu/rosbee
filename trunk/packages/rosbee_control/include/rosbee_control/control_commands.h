@@ -15,7 +15,7 @@
 #define READ_US 		912
 #define READ_STATUS		913
 
-#define MOVE_COMMAND(cntr,speed,dir) "$900, ## cntr ## , ## speed ## , ## dir ## ,"
+#define MOVE_COMMAND(cntr,speed,dir) "PC$900," #cntr "," #speed "," #dir ","
 
 
 #endif /* CONTROL_COMMANDS_H_ */
