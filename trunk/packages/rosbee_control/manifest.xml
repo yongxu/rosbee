@@ -8,6 +8,8 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rosbee_control</url>
+  <depend package="serial_port"/>
+  <depend package="roscpp"/>
 
 </package>
 
