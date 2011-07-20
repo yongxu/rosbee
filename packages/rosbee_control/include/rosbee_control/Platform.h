@@ -11,6 +11,8 @@
 #include <rosbee_control/control_commands.h>
 #include <serial_port/lightweightserial.h>
 #include <ros/ros.h>
+#include <ros/console.h>
+
 
 #define BAUTRATE B115200
 #define TIMEOUT -1
