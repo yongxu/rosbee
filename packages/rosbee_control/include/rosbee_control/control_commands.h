@@ -11,9 +11,9 @@
 #define ENABLE_PC 		902
 #define CLEAR_ERROR 	908
 #define TOGGLE_US 		909
-#define READ_ENCODERS 	911
-#define READ_US 		912
-#define READ_STATUS		913
+#define READ_ENCODERS 	913
+#define READ_US 		911
+#define READ_STATUS		912
 
 #define MOVE_COMMAND(cntr,speed,dir) "PC$900," #cntr "," #speed "," #dir ","
 
