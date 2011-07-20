@@ -5,7 +5,6 @@
  *  Author: Bram van de Klundert
  */
 
-/*TODO add debug prints*/
 /*TODO add comments to improve readability*/
 /*TODO rewrite commands to use precompiler defines*/
 #include <rosbee_control/Platform.h>
@@ -15,6 +14,7 @@ Platform* Platform::Pinstance=NULL;
 Platform::Platform()
 {
 	connected = false;
+	lwserialcon = NULL;
 }
 
 Platform::~Platform()
@@ -34,13 +34,13 @@ Platform* Platform::getInstance()
 bool Platform::connect(const char* device)
 {
 
-	if(connected && lwserialcon->is_ok())
+	if(connected && lwserialcon != NULL && lwserialcon->is_ok())
 	{
-		ROS_DEBUG_NAMED("serial","connection already open. return");
+		ROS_INFO_NAMED("serial","connection already open. return");
 		return true;
 	}
 	//delete any existing connection
-	else if (!lwserialcon->is_ok()) delete lwserialcon;
+	else if (lwserialcon!=NULL && !lwserialcon->is_ok())delete lwserialcon;
 	//open a new connection and check if opening was successful.
 	ROS_DEBUG_NAMED("serial","opening serial connection.");
 	lwserialcon = new LightweightSerial(device,BAUTRATE);
@@ -64,7 +64,7 @@ void Platform::move(int8_t speed,int8_t dir)
 
 	ROS_DEBUG_NAMED("platform","move(%i,%i)",speed,dir);
 	stringstream ss;
-	ss << MOVE_CMD << ',' << count << ',' << speed << ',' << dir;
+	ss << MOVE_CMD << ',' << (int)count << ',' << (int)speed << ',' << (int)dir << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -81,9 +81,9 @@ void Platform::Enable_motion(bool enable)
 	motion_enabled = enable;
 
 	ROS_DEBUG_NAMED("platform","enable_motion(%s)",(enable)?"true":"false");
-	ss << ENABLE_MOTION;
-	if(enable) ss << 1;
-	else ss << 0;
+	ss << ENABLE_MOTION<< ",";
+	if(enable) ss << 1 << ',';
+	else ss << 0 << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -97,9 +97,9 @@ void Platform::pc_control(bool enable)
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","enable_motion(%s)",(enable)?"true":"false");
-	ss << ENABLE_PC;
-	if(enable) ss << 1;
-	else ss << 0;
+	ss << ENABLE_PC<< ",";
+	if(enable) ss << 1 << ',';
+	else ss << 0 << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -113,7 +113,7 @@ void Platform::clear_error()
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","clear_erros()");
-	ss << CLEAR_ERROR;
+	ss << CLEAR_ERROR << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -127,9 +127,9 @@ void Platform::set_ultrasoon(bool enable)
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","set_ultrasoon(%s)",(enable)?"true":"false");
-	ss << TOGGLE_US;
-	if(enable) ss << 1;
-	else ss << 0;
+	ss << TOGGLE_US << ",";
+	if(enable) ss << 1 << ',';
+	else ss << 0 << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -139,10 +139,14 @@ void Platform::set_ultrasoon(bool enable)
 
 void Platform::read_encoders(int16_t* encoders_)
 {
-	if(!connected) return;
+	if(!connected)
+	{
+		ROS_DEBUG_NAMED("platform","read_encoders(),not connected");
+		return;
+	}
 	stringstream ss;
 	ROS_DEBUG_NAMED("platform","read_encoders()");
-	ss << READ_ENCODERS;
+	ss << READ_ENCODERS<< ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -178,7 +182,7 @@ void Platform::read_encoders(int16_t* encoders_)
 		tmp = strtok(NULL,",");
 	}
 	ROS_DEBUG_NAMED("platform","encoders 0:%i 1:%i",encoders[0],encoders[1]);
-	memcpy(encoders,encoders_,NR_ENCODER*sizeof(int16_t));
+	for(int j = 0; j<NR_ENCODER;j++)encoders_[j] = encoders[j];
 }
 
 void Platform::read_ultrasoon(int* ultrasoon)
@@ -186,7 +190,7 @@ void Platform::read_ultrasoon(int* ultrasoon)
 	if(!connected || ultrasoon_enable) return;
 	stringstream ss;
 	ROS_DEBUG_NAMED("platform","read_ultrasoon()");
-	ss << READ_US;
+	ss << READ_US << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -231,7 +235,7 @@ void Platform::read_status()
 {
 	if(!connected)return;
 	stringstream ss;
-	ss << READ_STATUS;
+	ss << READ_STATUS << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
@@ -279,16 +283,13 @@ bool Platform::write_to_platform(char* message,int size)
 		ROS_DEBUG_NAMED("serial","serial not connected, when trying to write");
 		return false;
 	}
+	stringstream ss;
 
 	//add "pc$" to the start and a "#\0" to the end
 	char tmpmsg[size+6];
-	strcpy(tmpmsg,"PC$");
-	strcpy(tmpmsg+3,message);
-	tmpmsg[size-3] = '#';
-	tmpmsg[size-2] = '\r';
-	tmpmsg[size-1] = 0;
-
-	ROS_DEBUG_NAMED("serial","writing to serial string: \"%s\"",tmpmsg);
+	ss << "PC$" << message << "#\r\0";
+	strcpy(tmpmsg,ss.str().c_str());
+	ROS_DEBUG_NAMED("serial","writing to serial string: \"%s\", tmpmsg: \"%s\"",message,tmpmsg);
 	//write to the platform
 	return lwserialcon->write_block(tmpmsg,size+5);
 }
@@ -310,7 +311,10 @@ bool Platform::read_from_platform(char* buffer, int size)
 	bzero(read,size);
 
 	ROS_DEBUG_NAMED("serial","starting read, searching for \"$\"");
-	while(read[0] != '$')lwserialcon->read(read);
+	while(read[0] != '$')
+	{
+		lwserialcon->read(read);
+	}
 
 	while(read[i] != '#' && i < size-1)
 	{
