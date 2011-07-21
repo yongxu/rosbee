@@ -6,6 +6,25 @@
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.6</pydev_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>/home/ros/rosbee/rosbee/packages/rosbee_control/src</path>
+<path>/home/ros/Desktop/serial_port/src</path>
+<path>/home/ros/Desktop/serial_port/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/utilities/cpp_common/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/utilities/cpp_common/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp_serialization/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/clients/cpp/roscpp_serialization/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/utilities/rostime/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/utilities/rostime/lib</path>
+<path>/opt/ros/diamondback/ros/core/roslib/src</path>
+<path>/opt/ros/diamondback/ros/core/roslib/lib</path>
+<path>/opt/ros/diamondback/ros/tools/rospack/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/utilities/xmlrpcpp/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/utilities/xmlrpcpp/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/tools/rosconsole/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/tools/rosconsole/lib</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/messages/std_msgs/src</path>
+<path>/opt/ros/diamondback/stacks/ros_comm/messages/rosgraph_msgs/src</path>
 <path>/opt/ros/diamondback/ros/core/mk</path>
 <path>/usr/local/lib/python2.6/dist-packages/rosinstall-0.5.7-py2.6.egg</path>
 <path>/opt/ros/diamondback/ros/core/roslib/src</path>
