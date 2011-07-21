@@ -9,9 +9,11 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/rosbee_tf</url>
   <depend package="roscpp"/>
-  <depend package="rosmsg"/>
-  <depend package="rosbee_control"/>
-
+  <depend package="rosmsg"/> 
+	<depend package="tf"/>
+	<depend package="nav_msgs"/>
+	<depend package="geometry_msgs"/>
+	<depend package="rosbee_control"/>
 </package>
 
 
