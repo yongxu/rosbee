@@ -91,21 +91,16 @@ int main(int argc, char** argv)
 	rosbee_control::encoders msg;
 
 	//init platform
-	itsPlatform = Platform::getInstance();
+	itsPlatform = Platform::getInstance(n);
 	itsPlatform->connect("/dev/ttyUSB0");
 	itsPlatform->pc_control(true);
 	usleep(SERIALTIMEOUT);
 	itsPlatform->Enable_motion(true);
 	usleep(SERIALTIMEOUT);
 	
-	int16_t encVal[2];	
-	
 	while(ros::ok())
 	{
-		itsPlatform->read_encoders(encVal);
-		msg.leftEncoder = encVal[0];
-		msg.rightEncoder = encVal[1];
-		pub.publish(msg);
+		itsPlatform->read_encoders();
 		
 		ros::spinOnce();
 		LoopRate.sleep();
