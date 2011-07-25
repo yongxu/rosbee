@@ -25,10 +25,8 @@ Platform::~Platform()
 	{
 		connected = false;
 		lwserialcon->~LightweightSerial();
-		//pthread_join(*readthread,NULL);
-		//pthread_join(*xbeethread,NULL);
-		breadthread.join();
-		bxbeethread.join();
+		breadthread->join();
+		bxbeethread->join();
 	}
 }
 
@@ -59,17 +57,17 @@ bool Platform::connect(const char* device)
 		ROS_DEBUG_NAMED("serial","failed to open serial connection.");
 		return connected = false;
 	}
+	else connected = true;
+
 	ROS_DEBUG_NAMED("readthread","starting read thread.");
-	breadthread = boost::thread(Platform::readloop);
-	//pthread_create(readthread,NULL,Platform::readloop,NULL);
+	breadthread = new boost::thread(&Platform::readloop);
 	ROS_DEBUG_NAMED("xbeethread","starting xbee thread.");
-	bxbeethread = boost::thread(Platform::handlexbee);
-	//pthread_create(xbeethread,NULL,Platform::handlexbee,NULL);
+	bxbeethread = new boost::thread(&Platform::handlexbee);
 	//sleep a short while to make sure the thread had time to start.
 	sleep(1);
 	//if the connection was opened successfully get the status of the platform
 	read_status();
-	return connected = true;
+	return connected;
 }
 
 
@@ -213,15 +211,6 @@ void Platform::read_status()
 		ROS_DEBUG_NAMED("platform","write to platform failed");
 		return;
 	}
-
-	char buffer[80];
-	bzero(buffer,80);
-
-	if(!read_from_platform(buffer,80))
-	{
-		ROS_DEBUG_NAMED("platform","read from platform failed");
-		return;
-	}
 }
 /*** end platform control ***/
 
@@ -316,12 +305,15 @@ void* Platform::readloop(/*void* ret*/)
 void* Platform::handlexbee(/*void* ret*/)
 {
 	int readindex=0;
+	char splitmsg[10];
 	while(Pinstance->connected)
 	{
 		if(readindex < Pinstance->writeindex)
 		{
 			ROS_DEBUG_NAMED("xbeethread","handling message: #%i",readindex);
-			switch(atoi(strtok(Pinstance->readbuffer[readindex%NRMSGS]+1,",")))
+			bzero(splitmsg,10);
+			memcpy(splitmsg,Pinstance->readbuffer[readindex%NRMSGS]+1,3);
+			switch(atoi(strtok(splitmsg,",")))
 			{
 				case READ_ENCODERS: Pinstance->handle_encoder(Pinstance->readbuffer[readindex%NRMSGS]);
 					break;
@@ -367,22 +359,33 @@ void Platform::handle_encoder(char* command)
 void Platform::handle_status(char* command)
 {
 	ROS_DEBUG_NAMED("xbeethread","handle_status(\"%s\")",command);
+	char* splitptr;
 	if(READ_STATUS!=atoi(strtok(command+1,",")))
 	{
 		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
 		return;
 	}
 
-	Movemode = atoi(strtok(NULL,","));
-	Lastalarm = atoi(strtok(NULL,","));
-	Xbeetime = atoi(strtok(NULL,","));
-	Ppcgetcntr = atoi(strtok(NULL,","));
-	Platenable = atoi(strtok(NULL,","));
-	Pcenable = atoi(strtok(NULL,","));
-	Pfstatus = atoi(strtok(NULL,","));
-	Maincntr = atoi(strtok(NULL,","));
-	Safetycntr = atoi(strtok(NULL,","));
-	Version = atoi(strtok(NULL,","));
+	if((splitptr = strtok(NULL,",")) != NULL) Movemode = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Movemode");
+	if((splitptr = strtok(NULL,",")) != NULL) Lastalarm = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Lastalarm");
+	if((splitptr = strtok(NULL,",")) != NULL) Xbeetime = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Xbeetime");
+	if((splitptr = strtok(NULL,",")) != NULL) Ppcgetcntr = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Ppcgetcntr");
+	if((splitptr = strtok(NULL,",")) != NULL) Platenable = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Platenable");
+	if((splitptr = strtok(NULL,",")) != NULL) Pcenable = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Pcenable");
+	if((splitptr = strtok(NULL,",")) != NULL) Pfstatus = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Pfstatus");
+	if((splitptr = strtok(NULL,",")) != NULL) Maincntr = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Maincntr");
+	if((splitptr = strtok(NULL,",")) != NULL) Safetycntr = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Safetycntr");
+	if((splitptr = strtok(NULL,",")) != NULL) Version = atoi(splitptr);
+	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Version");
 
 }
 

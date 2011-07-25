@@ -1,2 +1,2 @@
-int16 leftEncoder
-int16 rightEncoder
+uint16 leftEncoder
+uint16 rightEncoder

@@ -72,11 +72,11 @@ private:
 	static void* handlexbee(/*void* ret*/);
 
 	LightweightSerial *lwserialcon;
-	pthread_t* readthread;
-	pthread_t* xbeethread;
+	//pthread_t* readthread;
+	//pthread_t* xbeethread;
 
-	boost::thread breadthread;
-	boost::thread bxbeethread;
+	boost::thread* breadthread;
+	boost::thread* bxbeethread;
 
 	char readbuffer[NRMSGS][MSGLENGHT];
 	int writeindex;
@@ -93,7 +93,7 @@ private:
 	bool pc_control_enabled;
 	bool ultrasoon_enable;
 	int ussensor[10];
-	int16_t encoders[2];
+	uint16_t encoders[2];
 	//query status vars.
 	int Movemode,Lastalarm,Xbeetime,Ppcgetcntr,Platenable,Pcenable,Pfstatus,Maincntr,Safetycntr,Version;
 	/*** end platform settings ***/
