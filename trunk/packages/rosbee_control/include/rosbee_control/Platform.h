@@ -14,6 +14,8 @@
 #include <ros/console.h>
 #include <pthread.h>
 
+#include <boost/thread.hpp>
+
 
 #define BAUTRATE 115200
 #define TIMEOUT -1
@@ -66,12 +68,15 @@ private:
 	//reads at most size chars from the platform.
 	bool read_from_platform(char* buffer,int size);
 
-	static void* readloop(void* ret);
-	static void* handlexbee(void* ret);
+	static void* readloop(/*void* ret*/);
+	static void* handlexbee(/*void* ret*/);
 
 	LightweightSerial *lwserialcon;
 	pthread_t* readthread;
 	pthread_t* xbeethread;
+
+	boost::thread breadthread;
+	boost::thread bxbeethread;
 
 	char readbuffer[NRMSGS][MSGLENGHT];
 	int writeindex;
