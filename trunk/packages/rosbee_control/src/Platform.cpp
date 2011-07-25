@@ -11,22 +11,30 @@
 
 Platform* Platform::Pinstance=NULL;
 
-Platform::Platform()
+Platform::Platform(ros::NodeHandle n)
 {
 	connected = false;
+	pub = n.advertise<rosbee_control::encoders>("enc", 1);
 	lwserialcon = NULL;
+	bzero(readbuffer,NRMSGS*MSGLENGHT);
 }
 
 Platform::~Platform()
 {
-	if(connected) lwserialcon->~LightweightSerial();
+	if(connected)
+	{
+		connected = false;
+		lwserialcon->~LightweightSerial();
+		pthread_join(*readthread,NULL);
+		pthread_join(*xbeethread,NULL);
+	}
 }
 
-Platform* Platform::getInstance()
+Platform* Platform::getInstance(ros::NodeHandle nh)
 {
 	if(Pinstance == NULL)
 	{
-		Pinstance = new Platform();
+		Pinstance = new Platform(nh);
 	}
 	return Pinstance;
 }
@@ -49,6 +57,12 @@ bool Platform::connect(const char* device)
 		ROS_DEBUG_NAMED("serial","failed to open serial connection.");
 		return connected = false;
 	}
+	ROS_DEBUG_NAMED("readthread","starting read thread.");
+	pthread_create(readthread,NULL,Platform::readloop,NULL);
+	ROS_DEBUG_NAMED("xbeethread","starting xbee thread.");
+	pthread_create(xbeethread,NULL,Platform::handlexbee,NULL);
+	//sleep a short while to make sure the thread had time to start.
+	sleep(1);
 	//if the connection was opened successfully get the status of the platform
 	read_status();
 	return connected = true;
@@ -137,7 +151,7 @@ void Platform::set_ultrasoon(bool enable)
 		ROS_DEBUG_NAMED("platform","write to platform failed");
 }
 
-void Platform::read_encoders(int16_t* encoders_)
+void Platform::read_encoders()
 {
 	if(!connected)
 	{
@@ -155,37 +169,9 @@ void Platform::read_encoders(int16_t* encoders_)
 		ROS_DEBUG_NAMED("platform","write to platform failed");
 		return;
 	}
-
-	char buffer[50];
-	bzero(buffer,50);
-
-	if(!read_from_platform(buffer,50))
-	{
-		ROS_DEBUG_NAMED("platform","read from platform failed");
-		return;
-	}
-
-	char* tmp;
-	int i = 0;
-
-	if(READ_ENCODERS != atoi(strtok(buffer+1,",")))
-	{
-		ROS_DEBUG_NAMED("platform","read message doesnt match send type");
-		return;
-	}
-
-	tmp = strtok(NULL,",");
-	while(tmp != NULL && i < NR_ENCODER)
-	{
-		encoders[i]=atoi(tmp);
-		i++;
-		tmp = strtok(NULL,",");
-	}
-	ROS_DEBUG_NAMED("platform","encoders 0:%i 1:%i",encoders[0],encoders[1]);
-	for(int j = 0; j<NR_ENCODER;j++)encoders_[j] = encoders[j];
 }
 
-void Platform::read_ultrasoon(int* ultrasoon)
+void Platform::read_ultrasoon()
 {
 	if(!connected || ultrasoon_enable) return;
 	stringstream ss;
@@ -208,27 +194,6 @@ void Platform::read_ultrasoon(int* ultrasoon)
 		ROS_DEBUG_NAMED("platform","read from platform failed");
 		return;
 	}
-
-	char* tmp;
-	int i = 0;
-
-	if(READ_US != atoi(strtok(buffer+1,",")))
-	{
-		ROS_DEBUG_NAMED("platform","read message doesnt match send type");
-		return;
-	}
-
-	tmp = strtok(NULL,",");
-	while(tmp != NULL && i < NR_ULTRASOON)
-	{
-		ussensor[i]=atoi(tmp);
-		i++;
-		tmp = strtok(NULL,",");
-	}
-	ROS_DEBUG_NAMED("platform","encoders 0:%i 1:%i 2:%i 3:%i 4:%i 5:%i 6:%i 7:%i 8:%i 9:%i",
-				ussensor[0],ussensor[1],ussensor[2],ussensor[3],ussensor[4],ussensor[5],
-				ussensor[6],ussensor[7],ussensor[8],ussensor[9]);
-	memcpy(ussensor,ultrasoon,NR_ENCODER*sizeof(int16_t));
 }
 
 void Platform::read_status()
@@ -253,25 +218,6 @@ void Platform::read_status()
 		ROS_DEBUG_NAMED("platform","read from platform failed");
 		return;
 	}
-
-	if(READ_STATUS!=atoi(strtok(buffer+1,",")))
-	{
-		ROS_DEBUG_NAMED("platform","read message doesnt match send type");
-		return;
-	}
-
-	Movemode = atoi(strtok(NULL,","));
-	Lastalarm = atoi(strtok(NULL,","));
-	Xbeetime = atoi(strtok(NULL,","));
-	Ppcgetcntr = atoi(strtok(NULL,","));
-	Platenable = atoi(strtok(NULL,","));
-	Pcenable = atoi(strtok(NULL,","));
-	Pfstatus = atoi(strtok(NULL,","));
-	Maincntr = atoi(strtok(NULL,","));
-	Safetycntr = atoi(strtok(NULL,","));
-	Version = atoi(strtok(NULL,","));
-
-
 }
 /*** end platform control ***/
 
@@ -328,4 +274,133 @@ bool Platform::read_from_platform(char* buffer, int size)
 	ROS_DEBUG_NAMED("serial","done reading, received \"%s\"",read);
 	strcpy(buffer,read);
 	return true;
+}
+
+void* Platform::readloop(void* ret)
+{
+	int i = 0;
+	char read[MSGLENGHT];
+	Pinstance->writeindex = 0;
+	while(Pinstance->connected)
+	{
+		bzero(read,MSGLENGHT);
+		ROS_DEBUG_NAMED("readthread","waiting for \'$\'");
+		while(read[0] != '$' && Pinstance->connected)
+		{
+			Pinstance->lwserialcon->read(read);
+			usleep(10);
+		}
+		ROS_DEBUG_NAMED("readthread","\'$\' found starting read");
+		i = 0;
+		while(read[i] != '#' && i < MSGLENGHT-1 && Pinstance->connected)
+		{
+			if(read[i] != 0 && read[i] != '\r')
+			{
+				i++;
+				read[i] = 0;
+			}
+			Pinstance->lwserialcon->read(read+i);
+			usleep(10);
+		}
+		ROS_DEBUG_NAMED("readthread","msg read: \"%s\".",read);
+		strcpy(Pinstance->readbuffer[Pinstance->writeindex%NRMSGS],read);
+		Pinstance->writeindex ++;
+	}
+	return NULL;
+}
+
+void* Platform::handlexbee(void* ret)
+{
+	int readindex=0;
+	while(Pinstance->connected)
+	{
+		if(readindex < Pinstance->writeindex)
+		{
+			ROS_DEBUG_NAMED("xbeethread","handling message: #%i",readindex);
+			switch(atoi(strtok(Pinstance->readbuffer[readindex%NRMSGS]+1,",")))
+			{
+				case READ_ENCODERS: Pinstance->handle_encoder(Pinstance->readbuffer[readindex%NRMSGS]);
+					break;
+				case READ_STATUS: Pinstance->handle_status(Pinstance->readbuffer[readindex%NRMSGS]);
+					break;
+				case READ_US: Pinstance->handle_ultrasoon(Pinstance->readbuffer[readindex%NRMSGS]);
+					break;
+				default:ROS_DEBUG_NAMED("xbeethread","unknown message: %i",atoi(strtok(Pinstance->readbuffer[readindex%NRMSGS]+1,",")));
+			}
+			readindex++;
+		}
+		usleep(1000);
+	}
+	return NULL;
+}
+
+void Platform::handle_encoder(char* command)
+{
+	rosbee_control::encoders msg;
+	char* tmp;
+	int i = 0;
+	ROS_DEBUG_NAMED("xbeethread","handle_encoder(\"%s\")",command);
+
+	if(READ_ENCODERS != atoi(strtok(command+1,",")))
+	{
+		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
+		return;
+	}
+	tmp = strtok(NULL,",");
+	while(tmp != NULL && i < NR_ENCODER)
+	{
+		encoders[i]=atoi(tmp);
+		i++;
+		tmp = strtok(NULL,",");
+	}
+	ROS_DEBUG_NAMED("xbeethread","encoders 0:%i 1:%i",encoders[0],encoders[1]);
+	msg.leftEncoder = encoders[0];
+	msg.rightEncoder = encoders[1];
+	pub.publish(msg);
+	ROS_DEBUG_NAMED("xbeethread","encoder values published");
+}
+
+void Platform::handle_status(char* command)
+{
+	ROS_DEBUG_NAMED("xbeethread","handle_status(\"%s\")",command);
+	if(READ_STATUS!=atoi(strtok(command+1,",")))
+	{
+		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
+		return;
+	}
+
+	Movemode = atoi(strtok(NULL,","));
+	Lastalarm = atoi(strtok(NULL,","));
+	Xbeetime = atoi(strtok(NULL,","));
+	Ppcgetcntr = atoi(strtok(NULL,","));
+	Platenable = atoi(strtok(NULL,","));
+	Pcenable = atoi(strtok(NULL,","));
+	Pfstatus = atoi(strtok(NULL,","));
+	Maincntr = atoi(strtok(NULL,","));
+	Safetycntr = atoi(strtok(NULL,","));
+	Version = atoi(strtok(NULL,","));
+
+}
+
+void Platform::handle_ultrasoon(char* command)
+{
+	char* tmp;
+	int i = 0;
+	ROS_DEBUG_NAMED("xbeethread","handle_ultrasoon(\"%s\")",command);
+	if(READ_ENCODERS != atoi(strtok(command+1,",")))
+	{
+		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
+		return;
+	}
+
+	tmp = strtok(NULL,",");
+	while(tmp != NULL && i < NR_ULTRASOON)
+	{
+		ussensor[i]=atoi(tmp);
+		i++;
+		tmp = strtok(NULL,",");
+	}
+	ROS_DEBUG_NAMED("xbeethread","encoders 0:%i 1:%i 2:%i 3:%i 4:%i 5:%i 6:%i 7:%i 8:%i 9:%i",
+					ussensor[0],ussensor[1],ussensor[2],ussensor[3],ussensor[4],ussensor[5],
+					ussensor[6],ussensor[7],ussensor[8],ussensor[9]);
 }
