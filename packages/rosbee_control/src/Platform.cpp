@@ -25,8 +25,10 @@ Platform::~Platform()
 	{
 		connected = false;
 		lwserialcon->~LightweightSerial();
-		pthread_join(*readthread,NULL);
-		pthread_join(*xbeethread,NULL);
+		//pthread_join(*readthread,NULL);
+		//pthread_join(*xbeethread,NULL);
+		breadthread.join();
+		bxbeethread.join();
 	}
 }
 
@@ -58,9 +60,11 @@ bool Platform::connect(const char* device)
 		return connected = false;
 	}
 	ROS_DEBUG_NAMED("readthread","starting read thread.");
-	pthread_create(readthread,NULL,Platform::readloop,NULL);
+	breadthread = boost::thread(Platform::readloop);
+	//pthread_create(readthread,NULL,Platform::readloop,NULL);
 	ROS_DEBUG_NAMED("xbeethread","starting xbee thread.");
-	pthread_create(xbeethread,NULL,Platform::handlexbee,NULL);
+	bxbeethread = boost::thread(Platform::handlexbee);
+	//pthread_create(xbeethread,NULL,Platform::handlexbee,NULL);
 	//sleep a short while to make sure the thread had time to start.
 	sleep(1);
 	//if the connection was opened successfully get the status of the platform
@@ -276,7 +280,7 @@ bool Platform::read_from_platform(char* buffer, int size)
 	return true;
 }
 
-void* Platform::readloop(void* ret)
+void* Platform::readloop(/*void* ret*/)
 {
 	int i = 0;
 	char read[MSGLENGHT];
@@ -309,7 +313,7 @@ void* Platform::readloop(void* ret)
 	return NULL;
 }
 
-void* Platform::handlexbee(void* ret)
+void* Platform::handlexbee(/*void* ret*/)
 {
 	int readindex=0;
 	while(Pinstance->connected)
