@@ -18,6 +18,8 @@
 #define DISTANCEBASETORWHEEL   0.205,0,0
 
 double prevEncR,prevEncL = 0;
+double encR;
+double encL;
 geometry_msgs::PoseStamped prevpose;
 
 tf::TransformListener * listener;
@@ -134,8 +136,8 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		ROS_DEBUG_NAMED("Odometry","Radius of curvature (left wheel): %.2lf", rl);
 
 		// angle we moved around the circle, in radians
-		// theta = 2 * PI * (l / (2 * PI * rl)) simplifies to:
-		theta = l / rl;
+		 theta = 2 * M_PI * (l / (2 * M_PI * rl));
+		//theta = l / rl;
 
 		ROS_DEBUG_NAMED("Odometry","Theta: %.2lf radians", theta);
 
@@ -184,7 +186,7 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 	pose.position.x = (Rx>Lx)?((Rx-Lx)/2):((Lx-Rx)/2);
 	pose.position.y =(Ry>Ly)?((Ry-Ly)/2):((Ly-Ry)/2);
 	pose.position.z = 0;
-	pose.orientation = tf::createQuaternionMsgFromYaw(theta);
+	pose.orientation = tf::createQuaternionMsgFromYaw(theta); //lelijk !!!!
 
 	ROS_DEBUG_NAMED("Odometry"," new pose generated::pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",pose.position.x,
 			pose.position.y,pose.position.z,pose.orientation.x,pose.orientation.y,
@@ -211,6 +213,7 @@ geometry_msgs::PoseStamped transformPose(double leftwheel,double rightwheel){
 		ROS_DEBUG_NAMED("TF","new pos for base  x=%f y=%f",odom_point.pose.position.x, odom_point.pose.position.y);
 
 
+
 	}
 	catch(tf::TransformException& ex){
 		ROS_ERROR_NAMED("TF","Received an exception trying to transform a point: %s", ex.what());
@@ -226,9 +229,20 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	double dell = msg->leftEncoder -  prevEncL;
 	ROS_DEBUG_NAMED("Odometry","delta r:%f,delta l:%f",delr,dell);
 
+	if(delr == 0)
+	{
+		delr= 0.0000001;
+	}
+	if(dell == 0)
+	{
+		dell= 0.0000001;
+	}
+
+
 	//calculate the angle from both encoders for tf --> //TODO
-	double encR = (-(delr*360)/FULLCIRCLEPULSE)*(M_PI/180);
-	double encL = (-(dell*360)/FULLCIRCLEPULSE)*(M_PI/180);
+	 encR += (delr*360)/FULLCIRCLEPULSE*(M_PI/180);
+	 encL += (dell*360)/FULLCIRCLEPULSE*(M_PI/180);
+	ROS_DEBUG_NAMED("TF","New Wheel Angle:R= %f L=%f",encR,encL);
 
 	//calulate the distance compared to last mesurement
 	double right = (OMTREKWHEEL*delr)/FULLCIRCLEPULSE;
@@ -242,7 +256,16 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	prevEncR = msg->rightEncoder;
 	prevEncL = msg->leftEncoder;
 
-	ROS_DEBUG_NAMED("TF","afstand Links: %f afstand Rechts: %f",left,right);
+}
+
+void pubOnce()
+{
+	static tf::TransformBroadcaster br;
+	tf::Transform transform;
+	transform.setOrigin(tf::Vector3(0,0,0));
+	transform.setRotation(tf::createQuaternionFromYaw(45 * (M_PI/180)));
+	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"odom", "base_link"));
+
 }
 
 int main(int argc, char **argv) {
@@ -255,7 +278,7 @@ int main(int argc, char **argv) {
 	odom_pub = new ros::Publisher();
 	*odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
 
-
+	pubOnce();
 
 	listener = new tf::TransformListener(n);
 	ros::spin();
