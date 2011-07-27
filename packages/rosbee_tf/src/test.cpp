@@ -10,54 +10,55 @@
 #include <tf/transform_listener.h>
 
 
-#define WHEELBASE 0.41
-#define FULLCIRCLEPULSE		36	
-#define OMTREKWHEEL		 0.4572	
-#define LOOPRATE 5
-#define DISTANCEBASETOSCANNER  0,0.2,0.2 
+#define WHEELBASE 			   0.41
+#define FULLCIRCLEPULSE		   36
+#define OMTREKWHEEL			   0.4572
+#define DISTANCEBASETOSCANNER  0,0.155,0.135
 #define DISTANCEBASETOLWHEEL  -0.205,0,0
 #define DISTANCEBASETORWHEEL   0.205,0,0
 
 double prevEncR,prevEncL = 0;
+geometry_msgs::PoseStamped prevpose;
+
 tf::TransformListener * listener;
 ros::Publisher * odom_pub;
-geometry_msgs::PoseStamped prevpose;
+
+
 
 void publishOdomMessage(geometry_msgs::PoseStamped pose){
 
-		double vx,vy,vth;
-		vx=vy=vth=0;
+	double vx,vy,vth;
+	vx=vy=vth=0;
 
-		nav_msgs::Odometry odom;
-	    odom.header.stamp = ros::Time::now();
-	    odom.header.frame_id = "odom";
+	nav_msgs::Odometry odom;
+	odom.header.stamp = ros::Time::now();
+	odom.header.frame_id = "odom";
 
-	    odom.pose.pose = pose.pose;
-	    //set the position
-	    double delx = pose.pose.position.x - prevpose.pose.position.x;
-	    double dely  = pose.pose.position.y - prevpose.pose.position.y;
-	   // double delz  = pose.pose.position.z - prevpose.pose.position.z;
+	odom.pose.pose = pose.pose;
+	//set the position
+	double delx = pose.pose.position.x - prevpose.pose.position.x;
+	double dely  = pose.pose.position.y - prevpose.pose.position.y;
 
+	ros::Duration delt;
+	delt.nsec = prevpose.header.stamp.nsec - ros::Time::now().nsec;
 
-	    ros::Duration delt;
-	    delt.nsec = prevpose.header.stamp.nsec - ros::Time::now().nsec;
+	vx = delx * delt.sec;
+	vy = dely * delt.sec;
+	// odom.pose.pose.orientation.x  = odom.pose.pose.orientation.x -odom.pose.pose.orientation.x;
+	//odom.pose.pose.orientation.y  = odom.pose.pose.orientation.y -odom.pose.pose.orientation.y;
+	//odom.pose.pose.orientation.z = odom.pose.pose.orientation.z -odom.pose.pose.orientation.z;
+	//odom.pose.pose.orientation.w = odom.pose.pose.orientation.w -odom.pose.pose.orientation.w;
 
-	    vx = delx * delt.sec;
-	    vy = dely * delt.sec;
-	   // odom.pose.pose.orientation.x  = odom.pose.pose.orientation.x -odom.pose.pose.orientation.x;
-	    //odom.pose.pose.orientation.y  = odom.pose.pose.orientation.y -odom.pose.pose.orientation.y;
-	    //odom.pose.pose.orientation.z = odom.pose.pose.orientation.z -odom.pose.pose.orientation.z;
-	    //odom.pose.pose.orientation.w = odom.pose.pose.orientation.w -odom.pose.pose.orientation.w;
+	//set the velocity
+	odom.child_frame_id = "base_link";
 
-	    //set the velocity
-	    odom.child_frame_id = "base_link";
-
-	    odom.twist.twist.linear.x = vx;
-	    odom.twist.twist.linear.y = vy;
-	    //odom.twist.twist.angular.z = vth;
-
-	    //publish the message
-	    odom_pub->publish(odom);
+	odom.twist.twist.linear.x = vx;
+	odom.twist.twist.linear.y = vy;
+	//odom.twist.twist.angular.z = vth;
+	ROS_DEBUG_NAMED("Odometry","X-velocity= %f Y-velocity= %f TH-velocity= %f",vx,vy,vth);
+	ROS_DEBUG_NAMED("Odometry","odom.pose.pose.orientation x=%f y=%f z=%f w=%f", odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w);
+	//publish the message
+	odom_pub->publish(odom);
 }
 
 
@@ -75,16 +76,15 @@ void publishTf(double encL, double encR, const geometry_msgs::PoseStamped base_p
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"base_link", "openni_camera"));
 
 	transform.setOrigin( tf::Vector3(DISTANCEBASETOLWHEEL));
-	transform.setRotation(tf::createQuaternionFromRPY(encL,0,0));//todo
+	transform.setRotation(tf::createQuaternionFromRPY(encL,0,0));
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"base_link", "leftWheel"));
 
 	transform.setOrigin( tf::Vector3(DISTANCEBASETORWHEEL));
-	transform.setRotation(tf::createQuaternionFromRPY(encR,0,0));//todo
+	transform.setRotation(tf::createQuaternionFromRPY(encR,0,0));
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"base_link", "rightWheel"));
 
 	publishOdomMessage(base_pose);
 	prevpose = base_pose;
-
 	ROS_DEBUG_NAMED("TF","TF Sended");
 }
 
@@ -125,8 +125,6 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		Rx = Rx + forwardx * r;
 		Ry = Ry + forwardy * r;
 
-		//pos_base
-
 	}
 	else
 	{
@@ -137,7 +135,7 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 
 		// angle we moved around the circle, in radians
 		// theta = 2 * PI * (l / (2 * PI * rl)) simplifies to:
-		 theta = l / rl;
+		theta = l / rl;
 
 		ROS_DEBUG_NAMED("Odometry","Theta: %.2lf radians", theta);
 
@@ -188,7 +186,7 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 	pose.position.z = 0;
 	pose.orientation = tf::createQuaternionMsgFromYaw(theta);
 
-	ROS_DEBUG_NAMED("Odometry","pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",pose.position.x,
+	ROS_DEBUG_NAMED("Odometry"," new pose generated::pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",pose.position.x,
 			pose.position.y,pose.position.z,pose.orientation.x,pose.orientation.y,
 			pose.orientation.z,pose.orientation.w);
 
@@ -204,12 +202,8 @@ geometry_msgs::PoseStamped transformPose(double leftwheel,double rightwheel){
 
 
 	base_point.header.frame_id = "base_link";
-//	base_point.header.stamp = ros::Time::now();
+	//	base_point.header.stamp = ros::Time::now();
 	base_point.pose = update_wheel_position(leftwheel,rightwheel);
-
-	ROS_DEBUG_NAMED("Odometry","pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",base_point.pose.position.x,
-			base_point.pose.position.y,base_point.pose.position.z,base_point.pose.orientation.x,base_point.pose.orientation.y,
-			base_point.pose.orientation.z,base_point.pose.orientation.w);
 
 	try{
 
@@ -232,7 +226,7 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	double dell = msg->leftEncoder -  prevEncL;
 	ROS_DEBUG_NAMED("Odometry","delta r:%f,delta l:%f",delr,dell);
 
-	//calculate the angle from both encoders for tf
+	//calculate the angle from both encoders for tf --> //TODO
 	double encR = (-(delr*360)/FULLCIRCLEPULSE)*(M_PI/180);
 	double encL = (-(dell*360)/FULLCIRCLEPULSE)*(M_PI/180);
 
@@ -256,18 +250,17 @@ int main(int argc, char **argv) {
 	//ros init
 	ros::init(argc, argv, "tfOdomBroadcaster");
 	ros::NodeHandle n;
-	//ros::Rate loop_rate(LOOPRATE);
 	//subscribe to encoders
 	ros::Subscriber subx = n.subscribe("/enc",10,enc);
-	 odom_pub = new ros::Publisher();
-	* odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
+	odom_pub = new ros::Publisher();
+	*odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
 
-	//ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
+
 
 	listener = new tf::TransformListener(n);
 	ros::spin();
 
 	delete listener;
-	//delete odom_pub;
+	delete odom_pub;
 	return 0;
 }
