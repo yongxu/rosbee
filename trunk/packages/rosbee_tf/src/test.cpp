@@ -13,7 +13,7 @@
 #define WHEELBASE 			   0.41
 #define FULLCIRCLEPULSE		   36.0
 #define OMTREKWHEEL			   (2.0* M_PI*(0.153/2.0))
-#define DISTANCEBASETOSCANNER  0,0.155,0.135
+#define DISTANCEBASETOSCANNER  0.155,0,0.135
 #define DISTANCEBASETOLWHEEL  	0,-0.205,0
 #define DISTANCEBASETORWHEEL   0,0.205,0
 
@@ -104,7 +104,7 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		// radius of curvature.  This handles that case.
 
 		// find forward by rotating the axle between the wheels 90 degrees
-		/*double axlex = Rx - Lx;
+		double axlex = Rx - Lx;
 		double axley = Ry - Ly;
 
 		double forwardx, forwardy;
@@ -121,11 +121,11 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		Ly = Ly + forwardy * l;
 
 		Rx = Rx + forwardx * r;
-		Ry = Ry + forwardy * r; */
-		ROS_DEBUG_NAMED("Odometry","IK BEN ERIN !");
+		Ry = Ry + forwardy * r;
+       /*
 		Lx=l;
 		Rx=r;
-		Ly=Ry=0;
+		Ly=Ry=0; */
 
 	}
 	else
@@ -184,12 +184,12 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		Ry = Ry_rotated + Py;
 	}
 
-	pose.position.x = ((Lx+Rx)/2.0);
-	pose.position.y = ((Ly+Ry)/2.0);
+	pose.position.y = ((Lx+Rx)/2.0);
+	pose.position.x = ((Ly+Ry)/2.0);
 	//pose.position.x = (Rx>Lx)?((Rx-Lx)/2.0):((Lx-Rx)/2.0);
 	//pose.position.y = (Ry>Ly)?((Ry-Ly)/2.0):((Ly-Ry)/2.0);
-	pose.position.z = 0;
-	pose.orientation = tf::createQuaternionMsgFromYaw(theta);
+	//pose.position.z = 0;
+	pose.orientation = tf::createQuaternionMsgFromYaw(-theta); //volgens mij niet helemaal de bedoeling,negatief maken
 
 	ROS_DEBUG_NAMED("Odometry"," new pose generated::pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",pose.position.x,
 			pose.position.y,pose.position.z,pose.orientation.x,pose.orientation.y,
