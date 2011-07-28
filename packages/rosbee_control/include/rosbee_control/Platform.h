@@ -57,6 +57,13 @@ public:
 	//connects to the robot on device
 	bool connect(const char* device);
 
+
+	int ussensor[10];
+	uint16_t encoders[2];
+
+	//query status vars.
+	int Movemode,Lastalarm,Xbeetime,Ppcgetcntr,Platenable,Pcenable,Pfstatus,Maincntr,Safetycntr,Version;
+
 private:
 	Platform(ros::NodeHandle n);
 	static Platform* Pinstance;
@@ -92,10 +99,8 @@ private:
 	bool motion_enabled;
 	bool pc_control_enabled;
 	bool ultrasoon_enable;
-	int ussensor[10];
-	uint16_t encoders[2];
-	//query status vars.
-	int Movemode,Lastalarm,Xbeetime,Ppcgetcntr,Platenable,Pcenable,Pfstatus,Maincntr,Safetycntr,Version;
+
+
 	/*** end platform settings ***/
 	bool connected;
 
