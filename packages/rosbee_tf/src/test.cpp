@@ -99,12 +99,12 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 
 	geometry_msgs::Pose pose;
 
-	if (fabs(r - l) < 0.001) {
+	if (l == r) {
 		// If both wheels moved about the same distance, then we get an infinite
 		// radius of curvature.  This handles that case.
 
 		// find forward by rotating the axle between the wheels 90 degrees
-		double axlex = Rx - Lx;
+		/*double axlex = Rx - Lx;
 		double axley = Ry - Ly;
 
 		double forwardx, forwardy;
@@ -121,7 +121,11 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		Ly = Ly + forwardy * l;
 
 		Rx = Rx + forwardx * r;
-		Ry = Ry + forwardy * r;
+		Ry = Ry + forwardy * r; */
+		ROS_DEBUG_NAMED("Odometry","IK BEN ERIN !");
+		Lx=l;
+		Rx=r;
+		Ly=Ry=0;
 
 	}
 	else
@@ -179,8 +183,11 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		Rx = Rx_rotated + Px;
 		Ry = Ry_rotated + Py;
 	}
-	pose.position.x = (Rx>Lx)?((Rx-Lx)/2.0):((Lx-Rx)/2.0);
-	pose.position.y = (Ry>Ly)?((Ry-Ly)/2.0):((Ly-Ry)/2.0);
+
+	pose.position.x = ((Lx+Rx)/2.0);
+	pose.position.y = ((Ly+Ry)/2.0);
+	//pose.position.x = (Rx>Lx)?((Rx-Lx)/2.0):((Lx-Rx)/2.0);
+	//pose.position.y = (Ry>Ly)?((Ry-Ly)/2.0):((Ly-Ry)/2.0);
 	pose.position.z = 0;
 	pose.orientation = tf::createQuaternionMsgFromYaw(theta);
 
