@@ -35,28 +35,32 @@ void publishOdomMessage(geometry_msgs::PoseStamped pose){
 	nav_msgs::Odometry odom;
 	odom.header.stamp = ros::Time::now();
 	odom.header.frame_id = "odom";
-
 	odom.pose.pose = pose.pose;
 
 	//set the position
-	double delx = pose.pose.position.x - prevpose.pose.position.x;
-	double dely  = pose.pose.position.y - prevpose.pose.position.y;
+	double delx =   pose.pose.position.x -prevpose.pose.position.x ;
+	double dely  =  pose.pose.position.y-  prevpose.pose.position.y;
+	double delth =  tf::getYaw(pose.pose.orientation) - tf::getYaw(prevpose.pose.orientation);
+
 
 	ros::Duration delt;
-	delt.nsec = prevpose.header.stamp.nsec - ros::Time::now().nsec;
+	delt = ros::Time::now() - prevpose.header.stamp;
+	ROS_DEBUG_NAMED("Odometry","delx= %f,dely=%f,delth=%f,delt.nsec=%i,delt.sec=%i",delx,dely,delth,delt.nsec,delt.sec);
 
-	vx = delx * delt.sec;
-	vy = dely * delt.sec;
-
+	vx = (delx/1000000000.0) * ((float)delt.nsec);
+	vy = (dely/1000000000.0) * ((float)delt.nsec);
+	vth= (delth/1000000000.0) *((float)delt.nsec);
 
 	//set the velocity
 	odom.child_frame_id = "base_link";
 
 	odom.twist.twist.linear.x = vx;
 	odom.twist.twist.linear.y = vy;
-	//odom.twist.twist.angular.z = vth;
+	odom.twist.twist.angular.z = vth;
+
+
 	ROS_DEBUG_NAMED("Odometry","X-velocity= %f Y-velocity= %f TH-velocity= %f",vx,vy,vth);
-	ROS_DEBUG_NAMED("Odometry","odom.pose.pose.orientation x=%f y=%f z=%f w=%f", odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w);
+	//ROS_DEBUG_NAMED("Odometry","odom.pose.pose.orientation x=%f y=%f z=%f w=%f", odom.pose.pose.orientation.x, odom.pose.pose.orientation.y, odom.pose.pose.orientation.z, odom.pose.pose.orientation.w);
 	//publish the message
 	odom_pub->publish(odom);
 }
@@ -186,9 +190,7 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 
 	pose.position.y = ((Lx+Rx)/2.0);
 	pose.position.x = ((Ly+Ry)/2.0);
-	//pose.position.x = (Rx>Lx)?((Rx-Lx)/2.0):((Lx-Rx)/2.0);
-	//pose.position.y = (Ry>Ly)?((Ry-Ly)/2.0):((Ly-Ry)/2.0);
-	//pose.position.z = 0;
+	pose.position.z = 0;
 	pose.orientation = tf::createQuaternionMsgFromYaw(-theta); //volgens mij niet helemaal de bedoeling,negatief maken
 
 	ROS_DEBUG_NAMED("Odometry"," new pose generated::pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",pose.position.x,
