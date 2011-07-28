@@ -30,7 +30,7 @@
 #include <sys/time.h>
 
 #define SERIALTIMEOUT 200*1000
-#define PULSEDISTANCEM		15.8/1000	
+#define PULSEDISTANCEM 15.8/1000
 
 using namespace std;
 
@@ -39,42 +39,13 @@ Platform* itsPlatform;
 
 void move(const geometry_msgs::Twist::ConstPtr& msg)
 {
-	/*
-	int16_t startVal[2];
-	int16_t encVal[2];		
-	int x = 0;
-
-	itsPlatform->read_encoders(startVal);
-	x = msg->linear.x/PULSEDISTANCEM;
-
-	usleep(SERIALTIMEOUT);
-	itsPlatform->move(128,0);
-
-	do
-	{
-		itsPlatform->read_encoders(encVal);
-		encVal[0] -= startVal[0];
-		encVal[1] -= startVal[1];
-
-		usleep(SERIALTIMEOUT);
-
-	}while(encVal[0] < x);
-	
-	itsPlatform->move(0,0); */
 	static timeval last;
-	static float x =0;
-	static float y =0;
-
 	timeval now;
 
-	x += msg->linear.x;
-	y += msg->linear.y;
-
 	gettimeofday(&now,NULL);
-
 	if(last.tv_usec < now.tv_usec - 200000 || last.tv_sec < now.tv_sec)
 	{
-		itsPlatform->move((int)x,(int)(y));
+		itsPlatform->move((int)(msg->linear.x*63.5),(int)(msg->angular.z*63.5));
 		gettimeofday(&last,NULL);
 	}	
 }
@@ -82,6 +53,9 @@ void move(const geometry_msgs::Twist::ConstPtr& msg)
 
 int main(int argc, char** argv)
 {
+	char readchar = 0;
+	int movespeed,movedir;
+	int enable_in;
 	//init ros stuff
 	ros::init(argc,argv,"tester");
 	ros::NodeHandle n;	
@@ -93,6 +67,8 @@ int main(int argc, char** argv)
 	//init platform
 	itsPlatform = Platform::getInstance(n);
 	itsPlatform->connect("/dev/ttyUSB0");
+
+
 	itsPlatform->pc_control(true);
 	usleep(SERIALTIMEOUT);
 	itsPlatform->Enable_motion(true);
@@ -100,8 +76,50 @@ int main(int argc, char** argv)
 	
 	while(ros::ok())
 	{
-		itsPlatform->read_encoders();
+		cout << "select option" << endl;
+		cout << "1. move" << endl;
+		cout << "2. read encoders" <<endl;
+		cout << "3. read ultrasoon" <<endl;
+		cout << "4. read status" <<endl;
+		cout << "5. set ultrasoon" <<endl;
+		cout << "6. clear errors" <<endl;
+		cin >> readchar;
 		
+		switch(readchar)
+		{
+		case '1': cout << endl << "enter speed (-128 to 127)" << endl;
+			cin >> movespeed;
+			cout << endl << "enter dir (-128 to 127)" << endl;
+			cin >> movedir;
+			itsPlatform->move(movespeed,movedir);
+			break;
+		case '2': itsPlatform->read_encoders();
+			cout << "encoders, ";
+			for(int i = 0; i< NR_ENCODER; i++)
+			{
+				cout << i << ": " << itsPlatform->encoders[i] << ", ";
+			}
+			cout << endl;
+			break;
+		case '3': itsPlatform->read_ultrasoon();
+			cout << "ultrasoon, ";
+			for(int i = 0; i< NR_ULTRASOON; i++)
+			{
+				cout << i << ": " << itsPlatform->ussensor[i] << ", ";
+			}
+			cout << endl;
+			break;
+		case '4': itsPlatform->read_status();
+			cout << "status, Movemode: " << itsPlatform->Movemode << ", Lastalarm: " << itsPlatform->Lastalarm << ", Xbeetime: " << itsPlatform->Xbeetime << ", Ppcgetcntr: " << itsPlatform->Ppcgetcntr << ", Platenable: " << itsPlatform->Platenable << ", Pcenable: " << itsPlatform->Pcenable << ", Pfstatus: " << itsPlatform->Pfstatus << ", Maincntr: " << itsPlatform->Maincntr << ", Safetycntr: " << itsPlatform->Safetycntr << ", Version: " << endl;
+			break;
+		case '5': cout << endl << "enable (0 or 1)" << endl;
+			cin >> enable_in;
+			itsPlatform->set_ultrasoon((enable_in==0)?false:true);
+			break;
+		case '6': itsPlatform->clear_error();
+			break;
+		default: cout << "unknown option" << endl;
+		}
 		ros::spinOnce();
 		LoopRate.sleep();
 	}
