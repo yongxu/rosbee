@@ -11,8 +11,8 @@
 
 
 #define WHEELBASE 			   0.41
-#define FULLCIRCLEPULSE		   36
-#define OMTREKWHEEL			   2* M_PI*0.153
+#define FULLCIRCLEPULSE		   36.0
+#define OMTREKWHEEL			   (2.0* M_PI*(0.153/2.0))
 #define DISTANCEBASETOSCANNER  0,0.155,0.135
 #define DISTANCEBASETOLWHEEL  -0.205,0,0
 #define DISTANCEBASETORWHEEL   0.205,0,0
@@ -37,13 +37,6 @@ void publishOdomMessage(geometry_msgs::PoseStamped pose){
 	odom.header.frame_id = "odom";
 
 	odom.pose.pose = pose.pose;
-	double yaw = tf::getYaw(odom.pose.pose.orientation);
-	geometry_msgs::Quaternion q ;
-	q.x = tf::createQuaternionFromYaw(yaw + (90* M_PI/180)).getX();
-	q.y = tf::createQuaternionFromYaw(yaw + (90* M_PI/180)).getY();
-	q.z = tf::createQuaternionFromYaw(yaw + (90* M_PI/180)).getZ();
-	q.w = tf::createQuaternionFromYaw(yaw + (90* M_PI/180)).getW();
-	odom.pose.pose.orientation =q;
 
 	//set the position
 	double delx = pose.pose.position.x - prevpose.pose.position.x;
@@ -54,10 +47,7 @@ void publishOdomMessage(geometry_msgs::PoseStamped pose){
 
 	vx = delx * delt.sec;
 	vy = dely * delt.sec;
-	// odom.pose.pose.orientation.x  = odom.pose.pose.orientation.x -odom.pose.pose.orientation.x;
-	//odom.pose.pose.orientation.y  = odom.pose.pose.orientation.y -odom.pose.pose.orientation.y;
-	//odom.pose.pose.orientation.z = odom.pose.pose.orientation.z -odom.pose.pose.orientation.z;
-	//odom.pose.pose.orientation.w = odom.pose.pose.orientation.w -odom.pose.pose.orientation.w;
+
 
 	//set the velocity
 	odom.child_frame_id = "base_link";
@@ -72,7 +62,7 @@ void publishOdomMessage(geometry_msgs::PoseStamped pose){
 }
 
 
-void publishTf(double encL, double encR, const geometry_msgs::PoseStamped base_pose)
+void publishTf(const double encL, const double encR, const geometry_msgs::PoseStamped base_pose)
 {
 	static tf::TransformBroadcaster br;
 	tf::Transform transform;
@@ -82,7 +72,7 @@ void publishTf(double encL, double encR, const geometry_msgs::PoseStamped base_p
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"odom", "base_link"));
 
 	transform.setOrigin( tf::Vector3(DISTANCEBASETOSCANNER));
-	transform.setRotation(tf::createQuaternionFromRPY(0,0,90*(M_PI/180)));
+	transform.setRotation(tf::createQuaternionFromRPY(0,0,90.0*(M_PI/180.0)));
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"base_link", "openni_camera"));
 
 	transform.setOrigin( tf::Vector3(DISTANCEBASETOLWHEEL));
@@ -142,7 +132,7 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		ROS_DEBUG_NAMED("Odometry","Radius of curvature (left wheel): %.2lf", rl);
 
 		// angle we moved around the circle, in radians
-		 theta = 2 * M_PI * (l / (2 * M_PI * rl));
+		 theta = 2.0 * M_PI * (l / (2.0 * M_PI * rl));
 		//theta = l / rl;
 
 		ROS_DEBUG_NAMED("Odometry","Theta: %.2lf radians", theta);
@@ -189,10 +179,18 @@ geometry_msgs::Pose update_wheel_position(double l, double r) {
 		Rx = Rx_rotated + Px;
 		Ry = Ry_rotated + Py;
 	}
-	pose.position.x = (Ry>Ly)?((Ry-Ly)/2):((Ly-Ry)/2);
-	pose.position.y = (Rx>Lx)?((Rx-Lx)/2):((Lx-Rx)/2);
+	pose.position.x = (Rx>Lx)?((Rx-Lx)/2.0):((Lx-Rx)/2.0);
+	pose.position.y = (Ry>Ly)?((Ry-Ly)/2.0):((Ly-Ry)/2.0);
 	pose.position.z = 0;
 	pose.orientation = tf::createQuaternionMsgFromYaw(theta);
+
+	double yaw = tf::getYaw(pose.orientation);
+	geometry_msgs::Quaternion q ;
+	q.x = tf::createQuaternionFromYaw(yaw + (90.0* M_PI/180.0)).getX();
+	q.y = tf::createQuaternionFromYaw(yaw + (90.0* M_PI/180.0)).getY();
+	q.z = tf::createQuaternionFromYaw(yaw + (90.0* M_PI/180.0)).getZ();
+	q.w = tf::createQuaternionFromYaw(yaw + (90.0* M_PI/180.0)).getW();
+	pose.orientation =q;
 
 	ROS_DEBUG_NAMED("Odometry"," new pose generated::pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",pose.position.x,
 			pose.position.y,pose.position.z,pose.orientation.x,pose.orientation.y,
@@ -230,13 +228,20 @@ void pubOnce()
 	static tf::TransformBroadcaster br;
 	tf::Transform transform;
 	transform.setOrigin(tf::Vector3(0,0,0));
-	transform.setRotation(tf::createQuaternionFromYaw(90 * (M_PI/180)));
+	transform.setRotation(tf::createQuaternionFromYaw(90.0 * (M_PI/180.0)));
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"odom", "base_link"));
 
 }
 
 void enc(const rosbee_control::encoders::ConstPtr& msg)
 {
+	if(!b)
+	{
+		prevEncR = msg->rightEncoder;
+		prevEncL =  msg->leftEncoder;
+		b = true;
+	}
+
 
 	//get the difference between last and current position
 	double delr = msg->rightEncoder - prevEncR;
@@ -252,19 +257,15 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 		dell= 0.0000001;
 	}
 
-	//calculate the angle from both encoders for tf
-	 encR -= (delr*360)/FULLCIRCLEPULSE*(M_PI/180);
-	 encL -= (dell*360)/FULLCIRCLEPULSE*(M_PI/180);
-	ROS_DEBUG_NAMED("TF","New Wheel Angle:R= %f L=%f",encR,encL);
-
 	//calulate the distance compared to last mesurement
 	double right = (OMTREKWHEEL*delr)/FULLCIRCLEPULSE;
 	double left = (OMTREKWHEEL*dell)/FULLCIRCLEPULSE;
 	ROS_DEBUG_NAMED("Odometry","New distance: left wheel:%lf right wheel%lf",left,right);
 
-
-	ROS_DEBUG_NAMED("Odometry","ik moet een afstand afgelegd hebben van %f \n ik heb afgelegd: %f",OMTREKWHEEL*(delr)/FULLCIRCLEPULSE
-					,right);
+	//calculate the angle from both encoders for tf
+	encR -= ((360.0*delr)/FULLCIRCLEPULSE) *(M_PI/180.0);
+	encL -= ((360.0*dell)/FULLCIRCLEPULSE) *(M_PI/180.0);
+	ROS_DEBUG_NAMED("Odometry","New Wheel Angle:R= %f L=%f",(encR *(180/M_PI)),(encL*(180/M_PI)));
 
 	//publish TF
 	publishTf(encL,encR,transformPose(left,right));
@@ -286,7 +287,7 @@ int main(int argc, char **argv) {
 	ros::Subscriber subx = n.subscribe("/enc",10,enc);
 	odom_pub = new ros::Publisher();
 	*odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
-
+	encR=encL=0;
 	pubOnce();
 
 	listener = new tf::TransformListener(n);
