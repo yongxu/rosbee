@@ -64,6 +64,12 @@ public:
 	//query status vars.
 	int Movemode,Lastalarm,Xbeetime,Ppcgetcntr,Platenable,Pcenable,Pfstatus,Maincntr,Safetycntr,Version;
 
+	/*** platform settings ***/
+	bool motion_enabled;
+	bool pc_control_enabled;
+	bool ultrasoon_enable;
+	/*** end platform settings ***/
+
 private:
 	Platform(ros::NodeHandle n);
 	static Platform* Pinstance;
@@ -79,8 +85,6 @@ private:
 	static void* handlexbee(/*void* ret*/);
 
 	LightweightSerial *lwserialcon;
-	//pthread_t* readthread;
-	//pthread_t* xbeethread;
 
 	boost::thread* breadthread;
 	boost::thread* bxbeethread;
@@ -92,16 +96,8 @@ private:
 	void handle_encoder(char* command);
 	void handle_status(char* command);
 	void handle_ultrasoon(char* command);
-
 	/*** end read functions ***/
 
-	/*** platform settings ***/
-	bool motion_enabled;
-	bool pc_control_enabled;
-	bool ultrasoon_enable;
-
-
-	/*** end platform settings ***/
 	bool connected;
 
 protected:
