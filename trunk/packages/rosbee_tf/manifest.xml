@@ -14,6 +14,8 @@
 	<depend package="nav_msgs"/>
 	<depend package="geometry_msgs"/>
 	<depend package="rosbee_control"/>
+	<depend package="sensor_msgs"/>
+
 </package>
 
 
