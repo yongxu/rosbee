@@ -350,8 +350,8 @@ void Platform::handle_encoder(char* command)
 		tmp = strtok(NULL,",");
 	}
 	ROS_DEBUG_NAMED("xbeethread","encoders 0:%i 1:%i",encoders[0],encoders[1]);
-	msg.leftEncoder = encoders[0];
-	msg.rightEncoder = encoders[1];
+	msg.leftEncoder = encoders[1];
+	msg.rightEncoder = encoders[0];
 	pub.publish(msg);
 	ROS_DEBUG_NAMED("xbeethread","encoder values published");
 }
