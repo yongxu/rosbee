@@ -94,9 +94,9 @@ void Platform::Enable_motion(bool enable)
 {
 	if(!connected) return;
 	stringstream ss;
-	motion_enabled = enable;
 
 	ROS_DEBUG_NAMED("platform","enable_motion(%s)",(enable)?"true":"false");
+	motion_enabled = enable;
 	ss << ENABLE_MOTION<< ",";
 	if(enable) ss << 1 << ',';
 	else ss << 0 << ',';
@@ -113,6 +113,7 @@ void Platform::pc_control(bool enable)
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","enable_motion(%s)",(enable)?"true":"false");
+	pc_control_enabled = enable;
 	ss << ENABLE_PC<< ",";
 	if(enable) ss << 1 << ',';
 	else ss << 0 << ',';
@@ -143,6 +144,7 @@ void Platform::set_ultrasoon(bool enable)
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","set_ultrasoon(%s)",(enable)?"true":"false");
+	ultrasoon_enable = enable;
 	ss << TOGGLE_US << ",";
 	if(enable) ss << 1 << ',';
 	else ss << 0 << ',';
