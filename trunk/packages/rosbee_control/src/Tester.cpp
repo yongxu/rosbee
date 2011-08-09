@@ -1,24 +1,8 @@
 /********************************************************************
        program: Tester
-       Author: Michiel van Osch
-       Date: 11-7-2001
-       Description: Tester is a test program for testing the PlatformAPI
-                    for Keila's Unicycle. With this program I was able
-                    to communicate with the platform and read sensor
-                    values, and either set PCcontrol or motion enabled.
-                    However when I set control and motion after eachother
-                    the program gets stuck. Probably because you are
-                    not allowed to do this (and need to query in between
-                    or because some serial buffer does nog get flushed
-                    properly between commands.
-                    
-                    If I interleave with get_Rwheelpositions() (which
-                    now return ultrasoundsensorvalues I beleive
-                    the Tester works properly but reading sensor values
-                    disables the motion or control enabled.
-
-                    Therefore, the platform did NOT move yet using this
-                    program.
+       Author: Bram van de Klundert
+       Date: 9-8-2011
+       Description: Test program to move the platform using different functions inplemented in the platform class.
 *********************************************************************/
 
 #include "rosbee_control/Platform.h"
@@ -29,8 +13,8 @@
 #include "ros/ros.h"
 #include <sys/time.h>
 
+#define PLATFORM_PORT "/dev/ttyUSB0"
 #define SERIALTIMEOUT 200*1000
-#define PULSEDISTANCEM 15.8/1000
 
 using namespace std;
 
@@ -60,13 +44,11 @@ int main(int argc, char** argv)
 	ros::init(argc,argv,"tester");
 	ros::NodeHandle n;	
 	ros::Subscriber subx = n.subscribe("cmd_vel",10,move);
- 	ros::Publisher pub = n.advertise<rosbee_control::encoders>("enc", 1);
 	ros::Rate LoopRate(4);
-	rosbee_control::encoders msg;
 
 	//init platform
 	itsPlatform = Platform::getInstance(n);
-	itsPlatform->connect("/dev/ttyUSB0");
+	itsPlatform->connect(PLATFORM_PORT);
 
 
 	itsPlatform->pc_control(true);
