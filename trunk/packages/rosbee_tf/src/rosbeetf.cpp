@@ -16,8 +16,8 @@
 #define OMTREKWHEEL			   (2.0* M_PI*(0.153/2.0))
 #define DISTANCEBASETOSCANNER  0.155,0,0.155
 #define DISTANCEBASETOLASER    0.155,0,0.105
-#define DISTANCEBASETORWHEEL   0,0.205,0
-#define DISTANCEBASETOLWHEEL   0,-0.205,0
+#define DISTANCEBASETORWHEEL   0,-0.205,0
+#define DISTANCEBASETOLWHEEL   0,0.205,0
 
 double prevEncR,prevEncL,encR,encL;
 geometry_msgs::PoseStamped prevpose;
@@ -192,7 +192,7 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 	posestamp.pose.position.y = ((Lx+Rx)/2.0);
 	posestamp.pose.position.x = ((Ly+Ry)/2.0);
 	posestamp.pose.position.z = 0;
-	posestamp.pose.orientation = tf::createQuaternionMsgFromYaw(-theta); //volgens mij niet helemaal de bedoeling,negatief maken
+	posestamp.pose.orientation = tf::createQuaternionMsgFromYaw(theta); 
 
 	ROS_DEBUG_NAMED("Odometry"," new Platform pose generated! pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",posestamp.pose.position.x,
 			posestamp.pose.position.y,posestamp.pose.position.z,posestamp.pose.orientation.x,posestamp.pose.orientation.y,
