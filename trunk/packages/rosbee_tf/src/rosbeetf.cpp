@@ -188,7 +188,7 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 	//make posestamped message
 	geometry_msgs::PoseStamped posestamp;
 	posestamp.header.frame_id ="base_link";
-	posestamp.header.stamp = ros::Time::now();
+	posestamp.header.stamp = ros::Time(0);
 	posestamp.pose.position.y = ((Lx+Rx)/2.0);
 	posestamp.pose.position.x = ((Ly+Ry)/2.0);
 	posestamp.pose.position.z = 0;
