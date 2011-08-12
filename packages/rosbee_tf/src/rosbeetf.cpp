@@ -14,7 +14,8 @@
 #define WHEELBASE 			   0.41
 #define FULLCIRCLEPULSE		   36.0
 #define OMTREKWHEEL			   (2.0* M_PI*(0.153/2.0))
-#define DISTANCEBASETOSCANNER  0.155,0,0.135
+#define DISTANCEBASETOSCANNER  0.155,0,0.155
+#define DISTANCEBASETOLASER    0.155,0,0.105
 #define DISTANCEBASETORWHEEL   0,0.205,0
 #define DISTANCEBASETOLWHEEL   0,-0.205,0
 
@@ -69,6 +70,10 @@ void publishTf(const double encL, const double encR, const geometry_msgs::PoseSt
 
 	transform.setOrigin( tf::Vector3(DISTANCEBASETOSCANNER));
 	transform.setRotation(tf::createQuaternionFromRPY(0,0,0));
+	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"base_link", "openni_camera"));
+
+	transform.setOrigin( tf::Vector3(DISTANCEBASETOLASER));
+	transform.setRotation(tf::createQuaternionFromRPY(0,0,0));
 	br.sendTransform(tf::StampedTransform(transform, ros::Time::now(),"base_link", "laser"));
 
 	transform.setOrigin( tf::Vector3(DISTANCEBASETOLWHEEL));
@@ -120,11 +125,11 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 		//temporary solution. prevention for dividing 0.
 		if(r == 0)
 		{
-			r= 0.0000000001;
+			r= 0.00000001;
 		}
 		if(l == 0)
 		{
-			l= 0.0000000001;
+			l= 0.00000001;
 		}
 
 		double rl; // radius of curvature for left wheel
