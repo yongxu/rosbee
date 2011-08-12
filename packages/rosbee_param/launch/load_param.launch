@@ -1,0 +1,7 @@
+<launch>
+	<!--<rosparam file="$(find rosbee_param)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+	<rosparam file="$(find rosbee_param)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+	<rosparam file="$(find rosbee_param)/config/local_costmap_params.yaml" command="load" />
+	<rosparam file="$(find rosbee_param)/config/global_costmap_params.yaml" command="load" /> -->
+  <rosparam file="$(find rosbee_param)/config/base_local_planner_params.yaml" command="load" ns="move_base_node" />
+</launch>
