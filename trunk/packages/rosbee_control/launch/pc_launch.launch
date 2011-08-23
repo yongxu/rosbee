@@ -1,0 +1,12 @@
+<launch>
+
+<include file="$(find rosbee_param)/launch/load_param.launch" />
+<include file="$(find rosbee_param)/launch/load_costmap.launch" />
+
+<node name="map_server" pkg="map_server" type="map_server"/>
+
+<include file="$(find amcl)/examples/amcl_diff.launch" />
+
+<node name="rviz" pgk="rviz" type="rviz" />
+
+</launch>
