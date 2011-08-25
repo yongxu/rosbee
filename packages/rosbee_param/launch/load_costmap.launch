@@ -18,4 +18,6 @@
     <rosparam file="$(find rosbee_param)/config/costmap.yaml" command="load" ns="costmap" />
   </node>
 
+ <rosparam file="$(find rosbee_param)/config/base_local_planner_params.yaml" command="load" ns="move_base_node" />
+
 </launch>
