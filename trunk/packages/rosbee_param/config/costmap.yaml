@@ -34,6 +34,7 @@ footprint_padding: 0.01
 inflation_radius: 0.55
 cost_scaling_factor: 10.0
 lethal_cost_threshold: 100
-observation_sources: scan
+observation_sources: scan kinect_sensor
 scan: {data_type: LaserScan, expected_update_rate: 0.4,
   observation_persistence: 0.0, marking: true, clearing: true, max_obstacle_height: 0.4, min_obstacle_height: 0.08}
+kinect_sensor: { sensor_frame: /openni_rgb_frame, data_type: PointCloud, topic: /camera/depth/points, marking: true, clearing: true }
