@@ -3,7 +3,6 @@
 <arg name="map" default="~/rosbee/bagfiles/Fontyslaser.yaml" />
 
 <!-- load the parameters for the navigation stack/costmap -->
-<include file="$(find rosbee_param)/launch/load_param.launch" />
 <include file="$(find rosbee_param)/launch/load_costmap.launch" />
 
 <!-- start the map_server with the map parameter -->
