@@ -1,12 +1,18 @@
 <launch>
+<!-- set a default value for the map -->
+<arg name="map" default="~/rosbee/bagfiles/Fontyslaser.yaml" />
 
+<!-- load the parameters for the navigation stack/costmap -->
 <include file="$(find rosbee_param)/launch/load_param.launch" />
 <include file="$(find rosbee_param)/launch/load_costmap.launch" />
 
-<node name="map_server" pkg="map_server" type="map_server"/>
+<!-- start the map_server with the map parameter -->
+<node name="map_server" pkg="map_server" type="map_server" args="$(arg map)" />
 
+<!-- launch amcl for differential drive robots -->
 <include file="$(find amcl)/examples/amcl_diff.launch" />
 
-<node name="rviz" pgk="rviz" type="rviz" />
+<!-- start rviz -->
+<node name="rviz" pgk="rviz" type="rviz" args="-d ~/rosbee/bagfiles/rosbee_config.vcg" />
 
 </launch>
