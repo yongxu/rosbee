@@ -1,0 +1,6 @@
+<launch>
+<node name="slam_gmapping" pkg="gmapping" type="slam_gmapping" />
+
+<include file="$(find pr2_teleop)/teleop_keyboard.launch" />
+
+</launch>
