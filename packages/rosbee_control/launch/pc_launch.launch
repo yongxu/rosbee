@@ -1,6 +1,6 @@
 <launch>
 <!-- set a default value for the map -->
-<arg name="map" default="~/rosbee/bagfiles/Fontyslaser.yaml" />
+<arg name="map" default="/home/mechatronica/rosbee/bagfiles/Fontyslaser.yaml" />
 
 <!-- load the parameters for the navigation stack/costmap -->
 <include file="$(find rosbee_param)/launch/load_costmap.launch" />
@@ -12,6 +12,6 @@
 <include file="$(find amcl)/examples/amcl_diff.launch" />
 
 <!-- start rviz -->
-<node name="rviz" pgk="rviz" type="rviz" args="-d ~/rosbee/bagfiles/rosbee_config.vcg" />
+<node name="rviz" pkg="rviz" type="rviz" args="-d /home/mechatronica/rosbee/bagfiles/rosbee_config.vcg" />
 
 </launch>
