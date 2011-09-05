@@ -1,13 +1,56 @@
+
 TrajectoryPlannerROS:
+  #Independent settings for the local costmap
+  transform_tolerance: 0.3
+
+#what the heck is this param?
+  costmap_visualization_rate: 0.0
+
+  world_model: costmap
+
+#how many seconds to simulate trajectories
+  sim_time: 1.9
+#step size in meters for the simulation
+  sim_granularity: 0.025
+#using Dynamic Window Approach
+  dwa: true
+#number of X velocity samples to consider for simulation
+  vx_samples: 3
+#number of theta velocty samples to consider for simulation
+  vtheta_samples: 20
+
+#max linear speed
   max_vel_x: 2.0
+#min liner speed
   min_vel_x: 2.0
-  max_rotational_vel: 2.0
-  min_in_place_rotational_vel: 2.0
-  xy_goal_tolerance: 0.5
-  yaw_goal_tolerance: 0.2
+  max_vel_th: 2.0
   acc_lim_th: 1.0
   acc_lim_x: 1.0
   acc_lim_y: 1.0
-  controller_frequency: 7
+#weird (base planner documentation tells about max_rotational_vel)
+  min_vel_th: 2.0
+  min_in_place_vel_th: 2.0
+
+#goal tolerance parameters
+  xy_goal_tolerance: 0.5
+  yaw_goal_tolerance: 0.2
+  goal_distance_bias: 0.8
+  path_distance_bias: 0.6
+  occdist_scale: 0.01
+
+#how far to look ahead when scoring different in-place-rotation trajectories
+  heading_lookahead: 0.325
+
+#minimal distance to travel before turning the other way
+  oscillation_reset_dist: 0.05
+
+#whether to score based on the robot's heading to the path or its distance from the path
+  heading_scoring: false
+#how far to look ahead in time in seconds along the simulated trajectory when using heading scoring
+  heading_scoring_timestep: 0.8
+
+#is it an holomnic robot?
   holonomic_robot: false
-  escape_vel: -1.0
+
+#I have no idea what this does
+  simple_attractor: false
