@@ -3,4 +3,19 @@
 
 <include file="$(find pr2_teleop)/teleop_keyboard.launch" />
 
+<!-- start move_base -->
+<node name="move_base" pkg="move_base" type="move_base" >
+  <rosparam file="$(find rosbee_param)/config/base_local_planner_params.yaml" command="load"  />
+  <rosparam file="$(find rosbee_param)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+  <rosparam file="$(find rosbee_param)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+  <rosparam file="$(find rosbee_param)/config/global_costmap_params.yaml" command="load" />
+  <rosparam file="$(find rosbee_param)/config/local_costmap_params.yaml" comand="load" />
+</node>
+
+<!-- load the parameters for the navigation stack/costmap -->
+<node name="costmap_node" pkg="costmap_2d" type="costmap_2d_node" />
+
+<!-- start rviz -->
+<node name="rviz" pkg="rviz" type="rviz" args="-d /home/mechatronica/rosbee/bagfiles/rosbee_config.vcg" />
+
 </launch>
