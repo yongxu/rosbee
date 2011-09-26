@@ -3,7 +3,7 @@
 
 = Introduction =
 
-[rosbee_front.jpg link to picture]
+https://rosbee.googlecode.com/svn/wiki/rosbee_front.jpg
 
 
 = Details =
