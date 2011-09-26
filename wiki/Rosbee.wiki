@@ -1,6 +1,6 @@
 #summary Rosbee Mechatronics Labs at Fontys University of Applied Sciences.
 
-[http://code.google.com/p/rosbee/source/browse/trunk/pictures/rosbee_front.jpg]
+[http://code.google.com/p/rosbee/wiki/rosbee_front.jpg]
 
 = Introduction =
 
