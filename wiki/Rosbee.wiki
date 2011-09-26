@@ -3,7 +3,7 @@
 
 = Introduction =
 
-rosbee_front.jpg link to picture
+[rosbee_front.jpg link to picture]
 
 
 = Details =
