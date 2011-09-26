@@ -1,0 +1,16 @@
+<package>
+  <description brief="rosbee_control">
+
+     rosbee_control
+
+  </description>
+  <author>ROS</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/rosbee_control</url>
+  <depend package="serial_port"/>
+  <depend package="roscpp"/>
+	<depend package="geometry_msgs"/>
+</package>
+
+
