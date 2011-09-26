@@ -1,4 +1,5 @@
 #summary index for the sidebar
+#sidebar bla
 
 = Index =
 
