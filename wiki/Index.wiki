@@ -1,4 +1,4 @@
-#index for the sidebar
+#summary index for the sidebar
 
 = Index =
 
