@@ -1,10 +1,9 @@
-#summary Rosbee developed at Mechatronics Labs, Fontys University of Applied Sciences.
+#summary Rosbee Mechatronics Labs at Fontys University of Applied Sciences.
 
-[http://code.google.com/p/rosbee/wiki/rosbee_front.jpg]
 
 = Introduction =
 
-Add your content here.
+rosbee_front.jpg link to picture
 
 
 = Details =
