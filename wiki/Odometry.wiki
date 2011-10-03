@@ -1,17 +1,42 @@
 =Odometry=
-_by Sven Rademakers_ 3-Oct-2011
+_by Sven Rademakers_      3-Oct-2011
 
-Note: This document assumes familiarity with ROS and how to use it. and also knowledge about rviz and tf's.
+*Note*: This document assumes familiarity with ROS and how to use it. and also knowledge about rviz and tf's.
 
-https://rosbee.googlecode.com/svn/wiki/rviz_screen.jpg
+https://rosbee.googlecode.com/svn/wiki/rviz_screen.png
 
 Odometry is the use of data from moving sensors to estimate change in position over time. Odometry is used by some robots to estimate (not determine) their position relative to a starting location. This method is sensitive to errors due to the integration of velocity measurements over time to give position estimates. 
 *_wikipedia.org_*
 
 ==rosbee_tf node==
 
-ROS uses Odometry to estimate the position of the robot. Especially the Navigation stack. Because every robot is different(2 wheeled, 4 wheeled, size of wheels ,distance bewteen wheels) we need to implement odometry manual. In our case it means that we need to know the the radius of the wheels, the length of the wheelbase and some information about wheelrotations, encoder values. fortunate ROS gives us a little hand with the transformation of tf-frames. 
+ROS uses Odometry to estimate the position of the robot. Especially the Navigation stack. Because every robot is different (2 wheeled, 4 wheeled, size of wheels ,distance bewteen wheels) we need to implement odometry manual. In our case it means that we need to know the the radius of the wheels, the length of the wheelbase and some information about wheel rotations, encoder values. Fortunate ROS gives us a little hand with the transformation of tf-frames. 
+
+in this document i will describe the steps that I took to get the Odomerty where it stands now.
+
+all code about Odometry is implemented in the rosbee_tf package.
+path: /trunk/rosbee_tf
 
 more info is found at
 http://www.ros.org/wiki/navigation
- 
+
+===Calculate trajectories===
+when driving with the robot we have roughly 3 scenario's: driving in a straight line, pivoting around axis, and making a corner.
+
+this is a picture that i found on the internet that describes almost the same  logic that i used in the rosbee_tf stack:
+
+https://rosbee.googlecode.com/svn/wiki/dsODO_FC_DeadReckoning.gif
+
+  *straight line
+  *pivoting
+  *turning
+https://rosbee.googlecode.com/svn/wiki/Odometry.gif
+
+
+
+===Setting up an TF-Tree===
+
+first we needed a transform model of the robot,TF tree. a TF tree give us information about relative positions and rotations. as you probably know a tf tree is chain with transforms that have one parent but can have multiple child's. 
+in the picture above you see also an example of the tf tree of the rosbee robot.
+as you can see in the left panel an tree has only one topframe, in this case /map. the /map frame has 1 child /odom wich has also an child /base_link. /base_link frame is an important frame. this frame mostly represents the center point of the robot.We also have 2 wheel frames, a laser frame  and a kinect frame. 
+//todo
