@@ -1,0 +1,15 @@
+=Odometry=
+_by Sven Rademakers_ 3-Oct-2011
+
+Note: This document assumes familiarity with ROS and how to use it. and also knowledge about rviz and tf's.
+
+Odometry is the use of data from moving sensors to estimate change in position over time. Odometry is used by some robots to estimate (not determine) their position relative to a starting location. This method is sensitive to errors due to the integration of velocity measurements over time to give position estimates. 
+*_wikipedia.org_*
+
+==rosbee_tf node==
+
+ROS uses Odometry to estimate the position of the robot. Especially the Navigation stack. Because every robot is different(2 wheeled, 4 wheeled, size of wheels ,distance bewteen wheels) we need to implement odometry manual. In our case it means that we need to know the the radius of the wheels, the length of the wheelbase and some information about wheelrotations, encoder values. fortunate ROS gives us a little hand with the transformation of tf-frames. 
+
+more info is found at
+http://www.ros.org/wiki/navigation
+ 
