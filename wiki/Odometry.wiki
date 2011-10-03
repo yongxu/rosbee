@@ -3,6 +3,8 @@ _by Sven Rademakers_ 3-Oct-2011
 
 Note: This document assumes familiarity with ROS and how to use it. and also knowledge about rviz and tf's.
 
+https://rosbee.googlecode.com/svn/wiki/rviz_screen.jpg
+
 Odometry is the use of data from moving sensors to estimate change in position over time. Odometry is used by some robots to estimate (not determine) their position relative to a starting location. This method is sensitive to errors due to the integration of velocity measurements over time to give position estimates. 
 *_wikipedia.org_*
 
