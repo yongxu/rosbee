@@ -22,7 +22,9 @@
 #define NR_ULTRASOON 10
 #define NR_ENCODER 2
 #define MSGLENGHT 50 //max size of one message
-#define NRMSGS 10 //size of the buffer in msgs
+#define NRMSGS 10 //size of the rotating read buffer
+#define NRWRITEMSGS 10 //size of the rotating write buffer
+#define WRITEFREQ 8
 
 using namespace std;
 
@@ -81,16 +83,22 @@ private:
 	//reads at most size chars from the platform.
 	bool read_from_platform(char* buffer,int size);
 
-	static void* readloop(/*void* ret*/);
-	static void* handlexbee(/*void* ret*/);
+	void addwritelist(char* message,int size);
+
+	static void* readloop();
+	static void* handlexbee();
+	static void* writeloop();
 
 	LightweightSerial *lwserialcon;
 
 	boost::thread* breadthread;
 	boost::thread* bxbeethread;
+	boost::thread* bwritethread;
 
 	char readbuffer[NRMSGS][MSGLENGHT];
-	int writeindex;
+	char writebuffer[NRWRITEMSGS][MSGLENGHT];
+	int readwindex;
+	int writewindex;
 
 	/*** read functions ***/
 	void handle_encoder(char* command);
