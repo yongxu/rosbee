@@ -1,0 +1,15 @@
+#summary use of chrony in the project
+= Introduction =
+
+in the project we use chrony to synchronize the time on the different machines we run. (the robot: 192.168.1.146, desktop 1: 192.168.1.185 and desktop 2: 192.168.1.191)
+so we setup desktop 1 as a chrony server for the other systems to synchronize with.
+
+
+= Setting up chrony =
+
+to set up chrony on a system you first need to install chrony on it. to do so you have to run the command: 'sudo apt-get install chrony'.
+
+now chrony is installed we need to edit the chrony configuration file.
+the configuration file can be found in '/etc/chrony'.
+
+= WORK IN PROGRESS =
