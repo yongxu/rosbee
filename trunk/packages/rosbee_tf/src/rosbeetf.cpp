@@ -17,9 +17,8 @@
 #define DISTANCEBASETOLASER    0.155,0,0.105
 #define DISTANCEBASETORWHEEL   0,-0.205,0
 #define DISTANCEBASETOLWHEEL   0,0.205,0
-#define MARGIN								 0.01
+#define MARGIN								 0.02
 
-#define TWOPI    6.2831853072
 
 double prevEncR,prevEncL,encR,encL;
 geometry_msgs::PoseStamped prevpose;
