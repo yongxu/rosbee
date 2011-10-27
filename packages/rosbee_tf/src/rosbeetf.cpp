@@ -10,20 +10,25 @@
 #include <tf/transform_listener.h>
 #include <sensor_msgs/LaserScan.h>
 
-
-#define WHEELBASE 			   0.41
-#define FULLCIRCLEPULSE		   36.0
-#define OMTREKWHEEL			   (2.0* M_PI*(0.153/2.0))
+#define WHEELBASE 			       0.41
+#define FULLCIRCLEPULSE		     36.0
+#define OMTREKWHEEL			       (2.0* M_PI*(0.153/2.0))
 #define DISTANCEBASETOSCANNER  0.155,0,0.155
 #define DISTANCEBASETOLASER    0.155,0,0.105
 #define DISTANCEBASETORWHEEL   0,-0.205,0
 #define DISTANCEBASETOLWHEEL   0,0.205,0
+#define MARGIN								 0.01
+
+#define TWOPI    6.2831853072
 
 double prevEncR,prevEncL,encR,encL;
 geometry_msgs::PoseStamped prevpose;
 
 tf::TransformListener * listener;
 ros::Publisher * odom_pub;
+
+float CosPrev =  1;    // previous value for Cos(Theta)
+float SinPrev =  0;    // previous value for Sin(Theta)
 
 void publishOdomMessage(geometry_msgs::PoseStamped pose){
 
@@ -89,6 +94,49 @@ void publishTf(const double encL, const double encR, const geometry_msgs::PoseSt
 
 
 geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
+	
+	double theta =0;
+	double posx=0,posy=0;
+	double CosNow=0,SinNow=0;
+
+	if (fabs(r-l) <= MARGIN) {
+		posy = ((l+r)/2) * SinPrev;
+		posx =((l+r)/2) * CosPrev;	
+		ROS_DEBUG_NAMED("Odometry","===Straight Line===");	
+	}
+	else if(fabs(r+l) <= MARGIN){
+		double dtheta = (r-l)/WHEELBASE;
+		theta =  fmodf((theta+dtheta),(2*M_PI));
+		CosPrev=cosf(theta); // for the next cycle
+    SinPrev=sinf(theta);
+		ROS_DEBUG_NAMED("Odometry","===Pivoting===");	
+	}
+	else{
+		double dtheta = (r-l)/WHEELBASE;
+		theta =  fmodf((theta+dtheta),(2*M_PI));
+		CosNow=cosf(theta);
+    SinNow=sinf(theta);
+	ROS_DEBUG_NAMED("Odometry","===Cornering===");	
+
+   double Radius=(WHEELBASE/2)*((r+l)/(r-l));
+    posx=Radius*(SinNow-SinPrev);
+    posy=Radius*(CosPrev-CosNow);
+
+		}
+			//make posestamped message
+		geometry_msgs::PoseStamped posestamp;
+		posestamp.header.frame_id ="base_link";
+		posestamp.header.stamp = ros::Time(0);
+		posestamp.pose.position.y = posy;
+		posestamp.pose.position.x = posx;
+		posestamp.pose.position.z = 0;
+		posestamp.pose.orientation = tf::createQuaternionMsgFromYaw(theta); 	
+    ROS_DEBUG_NAMED("Odometry"," new Platform pose generated! pose= x:%f y:%f YAW(deg):%f",posx,posy,theta *(180/M_PI));
+
+		return posestamp;
+}
+/*
+geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 
 	double Lx = -WHEELBASE/2.0;
 	double Ly = 0.0;
@@ -96,29 +144,29 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 	double Ry = 0.0;
 	double theta =0;
 
-	if (l == r) {
+	if (fabs(r-l) <= MARGIN) {
 		// If both wheels moved about the same distance, then we get an infinite
 		// radius of curvature.  This handles that case.
 
-		// find forward by rotating the axle between the wheels 90 degrees
-		double axlex = Rx - Lx;
-		double axley = Ry - Ly;
+		//// find forward by rotating the axle between the wheels 90 degrees
+		//double axlex = Rx - Lx;
+		//double axley = Ry - Ly;
+    //
+		//double forwardx, forwardy;
+		//forwardx = -axley;
+		//forwardy = axlex;
+    //
+		//// normalize
+		//double length = sqrt(forwardx*forwardx + forwardy*forwardy);
+		//forwardx = forwardx / length;
+		//forwardy = forwardy / length;
 
-		double forwardx, forwardy;
-		forwardx = -axley;
-		forwardy = axlex;
+		//// move each wheel forward by the amount it moved
+		//Lx = Lx + forwardx * l;
+		//Ly = Ly + forwardy * l;
 
-		// normalize
-		double length = sqrt(forwardx*forwardx + forwardy*forwardy);
-		forwardx = forwardx / length;
-		forwardy = forwardy / length;
-
-		// move each wheel forward by the amount it moved
-		Lx = Lx + forwardx * l;
-		Ly = Ly + forwardy * l;
-
-		Rx = Rx + forwardx * r;
-		Ry = Ry + forwardy * r;
+		//Rx = Rx + forwardx * r;
+		//Ry = Ry + forwardy * r;
 	}
 	else
 	{
@@ -199,13 +247,14 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 			posestamp.pose.orientation.z,posestamp.pose.orientation.w);
 
 	return posestamp;
-}
+} */
+
 
 geometry_msgs::PoseStamped transformPose(geometry_msgs::PoseStamped pose){
 
 	geometry_msgs::PoseStamped odom_point;
 	odom_point.pose = geometry_msgs::Pose();
-	odom_point.pose.orientation =tf::createQuaternionMsgFromYaw(0);
+	odom_point.pose.orientation =tf::createQuaternionMsgFromYaw(2);
 
 	try{
 		listener->transformPose("odom", pose, odom_point);
@@ -213,8 +262,13 @@ geometry_msgs::PoseStamped transformPose(geometry_msgs::PoseStamped pose){
 
 	}
 	catch(tf::TransformException& ex){
-		ROS_ERROR_NAMED("TF","Received an exception trying to transform a point: %s", ex.what());
+		ROS_DEBUG_NAMED("Odometry","Received an exception trying to transform a point: %s", ex.what());
+	return odom_point;
 	}
+	
+	//save prevpose
+	prevpose = pose;
+
 	return odom_point;
 }
 
@@ -236,8 +290,10 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	{
 		prevEncR = msg->rightEncoder;
 		prevEncL =  msg->leftEncoder;
+    return;
 	}
 
+	ROS_DEBUG_NAMED("Odometry","prevEnc r:%f ,PrevEnc l:%f NewEnc l:%i, NewEnc R:%i",prevEncR,prevEncL, msg->leftEncoder,msg->rightEncoder);
 	//get the difference between last and current position
 	double delr = msg->rightEncoder - prevEncR;
 	double dell = msg->leftEncoder -  prevEncL;
@@ -263,22 +319,37 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	publishTf(encL,encR,pose);
 
 	//publish Odom message
-	publishOdomMessage(pose);
+	publishOdomMessage(pose); //TODO
 
-	//save prevpose
-	prevpose = pose;
+	
 
 	//save the encoder values for next call
 	prevEncR = msg->rightEncoder;
 	prevEncL = msg->leftEncoder;
+
+ ROS_DEBUG_NAMED("Odometry"," ");
 }
 
+
+	void publishOdom()
+	{
+	static tf::TransformBroadcaster br;
+		geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = ros::Time::now();
+    odom_trans.header.frame_id = "odom";
+    odom_trans.child_frame_id = "base_link";
+
+    //send the transform
+   br.sendTransform(odom_trans);
+	}
 
 int main(int argc, char **argv) {
 
 	//ros initialisation
 	ros::init(argc, argv, "tfBroadcaster");
 	ros::NodeHandle n;
+
+	publishOdom();
 
 	//init variables
 	encR=encL=prevEncL=prevEncR=0;
