@@ -1,7 +1,7 @@
 =Odometry=
 _by Sven Rademakers_      3-Oct-2011
 
-*Note*: This document assumes familiarity with ROS and how to use it. and also knowledge about rviz and tf's.
+*Note*: This document assumes familiarity with ROS and how to use it. Also knowledge about rviz and tf's.
 
 https://rosbee.googlecode.com/svn/wiki/rviz_screen.png
 
@@ -10,7 +10,7 @@ Odometry is the use of data from moving sensors to estimate change in position o
 
 ==rosbee_tf node==
 
-ROS uses Odometry to estimate the position of the robot. Especially the Navigation stack. Because every robot is different (2 wheeled, 4 wheeled, size of wheels ,distance bewteen wheels) we need to implement odometry manual. In our case it means that we need to know the the radius of the wheels, the length of the wheelbase and some information about wheel rotations, encoder values. Fortunate ROS gives us a little hand with the transformation of tf-frames. 
+ROS uses Odometry to estimate the position of the robot. Especially the Navigation stack uses odometry. Because every robot is different (2 wheeled, 4 wheeled, size of wheels ,distance bewteen wheels) we need to implement odometry manual. In our case it means that we need to know the the radius of the wheels, the length of the wheelbase and some information about wheel rotations, encoder values. Fortunate ROS gives us a little hand with the transformation of tf-frames. 
 
 in this document i will describe the steps that I took to get the Odomerty where it stands now.
 
@@ -20,6 +20,10 @@ path: /trunk/rosbee_tf
 more info is found at
 http://www.ros.org/wiki/navigation
 
+
+what we did first is to make sure that we can read encoder values from the paralax-board that is connected the the encoders.this code is implemented in the rosbee_control stack. 
+after the encoder values are obtained, we translated the incoming encoder-pulses to a distance.  
+
 ===Calculate trajectories===
 when driving with the robot we have roughly 3 scenario's: driving in a straight line, pivoting around axis, and making a corner.
 
@@ -27,12 +31,24 @@ this is a picture that i found on the internet that describes almost the same  l
 
 https://rosbee.googlecode.com/svn/wiki/dsODO_FC_DeadReckoning.gif
 
-  *straight line
-  *pivoting
-  *turning
+At this point the robot cant make a corner, due to hardware limitations, so we haven't implemented this state yet.
 https://rosbee.googlecode.com/svn/wiki/Odometry.gif
 
+  * driving in a straight line
+   this is the simplest calculation, we just look at the distance that is travelled by one wheel. code-wise i have implemented it like this:
 
+{{{
+
+if (fabs(r-l) <= MARGIN) {
+		posy = ((l+r)/2) * SinPrev;
+		posx =((l+r)/2) * CosPrev;	
+		ROS_DEBUG_NAMED("Odometry","===Straight Line===");	
+	}
+
+}}}
+
+  * pivoting 
+  * making a corner
 
 ===Setting up an TF-Tree===
 
