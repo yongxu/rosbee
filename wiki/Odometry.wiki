@@ -16,13 +16,86 @@ in this document i will describe the steps that I took to get the Odomerty where
 
 all code about Odometry is implemented in the rosbee_tf package.
 path: /trunk/rosbee_tf
+sources: /trunk/rosbee_tf/src/
 
 more info is found at
 http://www.ros.org/wiki/navigation
 
 
-what we did first is to make sure that we can read encoder values from the paralax-board that is connected the the encoders.this code is implemented in the rosbee_control stack. 
-after the encoder values are obtained, we translated the incoming encoder-pulses to a distance.  
+what we first did was to make sure that we can read encoder values from the paralax-board that is connected the the encoders.this specific code is implemented in the rosbee_control stack. 
+after the encoder values are obtained, we translate the incoming encoder-pulses to a distance. which we can calculate Odometry with.
+the last step is to publish some messages over ROS. If you look at the specification of the navigation stack, the move_base node to be exactly, you see that in order to get navigation working you need to publish 2 types of messages. a TF message and an Odomety message. 
+
+===Read Encoders===
+to get information about encoders you first need to get the rosbee_control stack up and running. this stack publishes encoder values over ROS in the format descriped in rosbee_control/msg/encoders.msg. Because of some computing limitations of the paralax we only can publish encoder values at a rate of  max 10hz. another problem is if we sample at that rate the delta of the encoder pulses will be 0. this due a low resolution of the encoders on the wheel. below i have posted some code from the rosbee_tf source, i left the unimportant parts blank. 
+ 
+{{{
+void enc(const rosbee_control::encoders::ConstPtr& msg)
+{
+	//set the prevEnc values only the first time, because there is no initial value when
+	//entering this method for the first time. assuming the values will never be 0.
+	if(prevEncL == 0 && prevEncR == 0)
+	{
+		prevEncR = msg->rightEncoder;
+		prevEncL =  msg->leftEncoder;
+    return;
+	}
+
+	ROS_DEBUG_NAMED("Odometry","prevEnc r:%f ,PrevEnc l:%f NewEnc l:%i, NewEnc R:%i",prevEncR,prevEncL, msg->leftEncoder,msg->rightEncoder);
+	//get the difference between last and current position
+	double delr = msg->rightEncoder - prevEncR;
+	double dell = msg->leftEncoder -  prevEncL;
+	ROS_DEBUG_NAMED("Odometry","delta r:%f pulses,delta l:%f pulses",delr,dell);
+
+	//calculate the distance the wheels have traveled, compared to last measurement.
+	double right = (OMTREKWHEEL*delr)/FULLCIRCLEPULSE;
+	double left = (OMTREKWHEEL*dell)/FULLCIRCLEPULSE;
+	ROS_DEBUG_NAMED("Odometry","New distance: left wheel:%lfm right wheel:%lfm",left,right);
+
+	//calculate the wheelangle from both encoders for tf in radian.(can be optimized).
+	encR += ((360.0*delr)/FULLCIRCLEPULSE) *(M_PI/180.0);
+	encL += ((360.0*dell)/FULLCIRCLEPULSE) *(M_PI/180.0);
+	ROS_DEBUG_NAMED("Odometry","New Wheel Angle:R=%f L=%f (degrees)",(encR *(180/M_PI)),(encL*(180/M_PI)));
+
+	//get new pose platform.
+	geometry_msgs::PoseStamped pose = calculatePlatformPose(left,right);
+
+	// translate the platform pose to a pose in the odom frame
+	pose = transformPose(pose);
+
+	//publish Transforms
+	publishTf(encL,encR,pose);
+
+	//publish Odom message
+	publishOdomMessage(pose); //TODO
+
+	
+
+	//save the encoder values for next call
+	prevEncR = msg->rightEncoder;
+	prevEncL = msg->leftEncoder;
+
+ ROS_DEBUG_NAMED("Odometry"," ");
+}
+
+
+int main(int argc, char **argv) {
+
+	//ros initialisation
+	ros::init(argc, argv, "tfBroadcaster");
+	ros::NodeHandle n;
+
+	//subscribe to encoders. every time an encoder value is published over ROS the enc method is called.
+	//we need this values to calculate the position/speed of the platform.
+	ros::Subscriber subx = n.subscribe("/enc",10,enc);
+
+	//run node.
+	ros::spin();
+
+	return 0;
+}
+
+}}}
 
 ===Calculate trajectories===
 when driving with the robot we have roughly 3 scenario's: driving in a straight line, pivoting around axis, and making a corner.
