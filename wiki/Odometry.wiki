@@ -51,25 +51,8 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	double right = (OMTREKWHEEL*delr)/FULLCIRCLEPULSE;
 	double left = (OMTREKWHEEL*dell)/FULLCIRCLEPULSE;
 	ROS_DEBUG_NAMED("Odometry","New distance: left wheel:%lfm right wheel:%lfm",left,right);
-
-	//calculate the wheelangle from both encoders for tf in radian.(can be optimized).
-	encR += ((360.0*delr)/FULLCIRCLEPULSE) *(M_PI/180.0);
-	encL += ((360.0*dell)/FULLCIRCLEPULSE) *(M_PI/180.0);
-	ROS_DEBUG_NAMED("Odometry","New Wheel Angle:R=%f L=%f (degrees)",(encR *(180/M_PI)),(encL*(180/M_PI)));
-
-	//get new pose platform.
-	geometry_msgs::PoseStamped pose = calculatePlatformPose(left,right);
-
-	// translate the platform pose to a pose in the odom frame
-	pose = transformPose(pose);
-
-	//publish Transforms
-	publishTf(encL,encR,pose);
-
-	//publish Odom message
-	publishOdomMessage(pose); //TODO
-
-	
+        
+        //calculate odometry/tf tree
 
 	//save the encoder values for next call
 	prevEncR = msg->rightEncoder;
@@ -88,6 +71,8 @@ int main(int argc, char **argv) {
 	//subscribe to encoders. every time an encoder value is published over ROS the enc method is called.
 	//we need this values to calculate the position/speed of the platform.
 	ros::Subscriber subx = n.subscribe("/enc",10,enc);
+        
+        // init some other stuff
 
 	//run node.
 	ros::spin();
