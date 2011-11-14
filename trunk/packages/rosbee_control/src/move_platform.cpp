@@ -12,8 +12,8 @@
 
 #define PLATFORM_PORT "/dev/ttyUSB0"
 #define SERIALTIMEOUT 200*1000
-
-int EncoderRate = 8; //read at which to read the encoders and ultrasoon, note that the current paralax can only handle 8 messages/sec.
+#define MULTI 2.0
+int EncoderRate = 5; //read at which to read the encoders and ultrasoon, note that the current paralax can only handle 8 messages/sec.
 
 Platform* itsPlatform;
 
@@ -30,11 +30,19 @@ void moveCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
 	static timeval last;
 	timeval now;
+	float x=0,y=0;
+
+	x = msg->linear.x * MULTI;
+	y = msg->angular.z * MULTI;
+	if(x > 2.0) x = 2.0;
+	if(x < -2.0) x = -2.0;
+	if(y > 2.0) y = 2.0;
+	if(y < -2.0) y = -2.0;
 
 	gettimeofday(&now,NULL);
-	if(last.tv_usec < now.tv_usec - 200000 || last.tv_sec < now.tv_sec)
+	if(last.tv_usec < now.tv_usec - 100000 || last.tv_sec < now.tv_sec)
 	{
-		itsPlatform->move((int)(msg->linear.x*63.5),(int)(msg->angular.z*63.5));
+		itsPlatform->move((int)(x*63.5),(int)(y*-63.5));
 		gettimeofday(&last,NULL);
 	}
 }
@@ -50,7 +58,9 @@ int main(int argc, char** argv)
 
 	//init platform
 	itsPlatform = Platform::getInstance(n);
-	itsPlatform->connect(PLATFORM_PORT);
+	ROS_DEBUG_NAMED("platform", "conecting");
+	while(!itsPlatform->connect(PLATFORM_PORT)) usleep(100);
+	ROS_DEBUG_NAMED("platform", "conected");
 
 	//enable the pc control and motion on the platform
 	itsPlatform->pc_control(true);
