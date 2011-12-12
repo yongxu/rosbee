@@ -10,3 +10,5 @@
 *[http://code.google.com/p/rosbee/wiki/chrony Chrony]
 
 *[http://code.google.com/p/rosbee/wiki/QuickGuide Quick Guide]
+
+*[http://code.google.com/p/rosbee/wiki/Setupguide Setup]
