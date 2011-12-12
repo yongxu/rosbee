@@ -1,13 +1,21 @@
 = Quick Guide =
 
-the purpose of this page is to get the rosbee robot up and running. 
+the purpose of this page is to get the rosbee robot up and running. more in depth information about setting up the rosbee can be found under the installation guide. 
 
 first check:
-- if the battery of the platform and the netbook is charged.
-- you connected the Laserscanner to the USB port of the netbook.
-- you connected the parallax board to the netbook via USB.
-- the wireless dongle is connected to the ethernet port of the netbook. and also is connected to USB port for power.
+  # if the battery of the platform and the netbook is charged.
+  # you connected the Laserscanner to the USB port of the netbook.
+  # you connected the parallax board to the netbook via USB.
+  # the wireless dongle is connected to the ethernet port of the netbook. and also is connected to USB port for power.
 
-* note: always connect the paralax board first before connecting other USB devices on the netbook. otherwise the parallax board gets another device name assigned by the OS and therefore is not able to connect to the board.
+  * note: always connect the paralax board first before connecting other USB devices on the netbook. otherwise the parallax board gets another device name assigned by the OS and therefore is not able to connect to the board.
 
 == network configuration ==
+https://rosbee.googlecode.com/svn/wiki/Netwerk.jpg
+
+make sure your network looks like this. 1 desktop pc also will do fine. The Only purpose it has for us now is to show extra debug information. we recommend you use desktop pc 2 (MSI 3D all in one) because of the computing power that is needed.
+
+== Running Mapping == 
+  # power up the netbook / desktop pc(s)
+  # flip the switch on the robot to "on 1" to turn on the platform.
+  # 
