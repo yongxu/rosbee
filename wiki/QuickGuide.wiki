@@ -1,3 +1,4 @@
+#summary a quick guide of how to set up the robot for navigation
 = Quick Guide =
 
 the purpose of this page is to get the rosbee robot up and running. more in depth information about setting up the rosbee can be found under the installation guide. 
@@ -11,7 +12,6 @@ first check:
   * note: always connect the paralax board first before connecting other USB devices on the netbook. otherwise the parallax board gets another device name assigned by the OS and therefore is not able to connect to the board.
 
 == Network configuration ==
-#summary a quick guide of how to set up the robot for navigation
 https://rosbee.googlecode.com/svn/wiki/Netwerk.jpg
 
 make sure your network looks like this. 1 desktop pc also will do fine. The Only purpose it has for us now is to show extra debug information, it also runs chrony server. we recommend you use desktop pc 2 (MSI 3D all in one) because of the computing power that is needed.
