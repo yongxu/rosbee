@@ -2,7 +2,7 @@
 = Introduction =
 
 in  the project we use chrony to synchronize the time on the different  machines we run. (the robot: 192.168.1.146, desktop 1: 192.168.1.185 and  desktop 2: 192.168.1.191) all the folowing guides will asume these ip's  are used. if you plan on using a different ip you will have to take  this into account when setting up chrony.
-ROS  is really strict when it comes to timing on TF's. to prevent ROS from  warning about it we setup desktop 1 as a chrony server and let the other  computers synchronize there time with it.
+ROS is really strict when it comes to timing on TF's. to prevent ROS from  warning about it we setup desktop 1 as a chrony server and let the other computers synchronize their time with it.
 
 
 = Setting up chrony on clients=
