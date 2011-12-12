@@ -1,3 +1,13 @@
 = Quick Guide =
 
-the purpose of this page is to get the rosbee robot up and running.
+the purpose of this page is to get the rosbee robot up and running. 
+
+first check:
+- if the battery of the platform and the netbook is charged.
+- you connected the Laserscanner to the USB port of the netbook.
+- you connected the parallax board to the netbook via USB.
+- the wireless dongle is connected to the ethernet port of the netbook. and also is connected to USB port for power.
+
+* note: always connect the paralax board first before connecting other USB devices on the netbook. otherwise the parallax board gets another device name assigned by the OS and therefore is not able to connect to the board.
+
+== network configuration ==
