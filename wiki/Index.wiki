@@ -6,3 +6,5 @@
 *[http://code.google.com/p/rosbee/wiki/Rosbee Rosbee]
 
 *[http://code.google.com/p/rosbee/wiki/Odometry Odometry]
+
+*[http://code.google.com/p/rosbee/wiki/QuickGuide Quick Guide]
