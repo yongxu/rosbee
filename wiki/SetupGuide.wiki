@@ -17,9 +17,13 @@ needed hardware:
  
 
 == Network ==
-please make a network that is similar to the image on the Quick Guide page.
+please make a network that is similar to the image on the [http://code.google.com/p/rosbee/wiki/QuickGuide Quick Guide] page.
+If you can ping from the robot to your desktop and vise versa your ok.
+ 
 == Setting up the netbook ==
   * install the lastest version of ROS
 follow the instructions on ros.org
 http://www.ros.org/wiki/ROS/Installation
 our software is tested on Diamondback, so if you encounter problems with running the software you may want to try to downgrade to Diamondback.
+  * checkout the lastest version of the rosbee repository. 
+contact the project admin if you dont have a SVN account. otherwise cd to your ROS_PACKAGE_PATH ( 
