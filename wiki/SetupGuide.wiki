@@ -1,0 +1,25 @@
+#summary guide for installing all the software from scratch
+
+= Setup Guide =
+guide for istalling all the software from scratch
+
+
+== Hardware ==
+
+needed hardware:
+  * Rosbee robot, contains:
+    * Paralax Board
+    * netbook with ubuntu 11.04 or greater
+    * Kinect or Laser scanner
+    * asus wireless access point
+  * Desktop PC with ubuntu 
+  * Wireless router
+ 
+
+== Network ==
+please make a network that is similar to the image on the Quick Guide page.
+== Setting up the netbook ==
+  * install the lastest version of ROS
+follow the instructions on ros.org
+http://www.ros.org/wiki/ROS/Installation
+our software is tested on Diamondback, so if you encounter problems with running the software you may want to try to downgrade to Diamondback.
