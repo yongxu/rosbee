@@ -21,9 +21,44 @@ please make a network that is similar to the image on the [http://code.google.co
 If you can ping from the robot to your desktop and vise versa your ok.
  
 == Setting up the netbook ==
-  * install the lastest version of ROS
-follow the instructions on ros.org
-http://www.ros.org/wiki/ROS/Installation
-our software is tested on Diamondback, so if you encounter problems with running the software you may want to try to downgrade to Diamondback.
-  * checkout the lastest version of the rosbee repository. 
-contact the project admin if you dont have a SVN account. otherwise cd to your ROS_PACKAGE_PATH ( 
+
+===Software===
+  * install the latest version of ROS
+ follow the instructions on ros.org
+ http://www.ros.org/wiki/ROS/Installation.
+ our software is tested on Diamondback, so if you encounter problems with running the software you may want to try to downgrade to Diamondback. also make sure you configured ros correct. if you type `ros` in a terminal and bash tab you should see a list with available roscommands. if not open bashrc 
+{{{
+sudo nano ~/.bashrc
+}}} 
+scroll to the bottom and check if you find a line that loads the ros's setup.bash.
+in diamondback:
+{{{
+source /opt/ros/diamondback/setup.bash
+}}}
+
+  * checkout the latest version of the rosbee repository. 
+ contact the project admin if you dont have a SVN account. in terminal do a checkout.
+{{{
+svn checkout https://rosbee.googlecode.com/svn/trunk/ rosbee --username <username>
+}}}
+
+ the simplest way is to checkout in the ROS_PACKAGE_PATH (echo $ROS_PACKAGE_PATH, to see whats your path). if your stack is not located in this path, ros wont be able to find our rosbee package.an other option is to add an custom path to the ROS_PACKAGE_PATH (export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:yourpath)
+
+  * the trunk
+ in the svn repository you will find 3 important packges , rosbee_control, rosbee_tf and rosbee_param. rosbee_control contains sources for controlling the motors and for reading encoders, to be more precisely the rosbee_control stack interfaces with the paralax board. more info at [http://code.google.com/p/rosbee/wiki/Rosbee_Control Rosbee_Control]. the rosbee_tf contains sources that will calculate tranforms,poses and odometry. the robot uses this data to to navigate. more info at [http://code.google.com/p/rosbee/wiki/Odometry Rosbee_Odometry]. the rosbee_param package is basically an list with parameters to configure the navigation stack in the correct way so it matches with properties of the robot.
+
+  * compile the code
+compiling of the code is easy. open an Terminal and run command: 
+{{{
+rosmake rosbee_control rosbee_tf --pre-clean --rosdep-install
+}}}
+
+  * static ip
+ set the ip of the netbook to 192.168.1.146. we also need to set the ROS_IP parameter, so that ros also knows our ip. The easiest way is to set this parameter everytime the terminal is opened.every time an terminal is opened bashrc will be executed. So we need to add a line to he bashrc script. run the following command:
+{{{
+sudo nano ~/.bashrc
+}}} 
+scroll all the way down and add the following line:
+{{{
+export ROS_IP=192.168.1.146
+}}}
