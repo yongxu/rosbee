@@ -91,7 +91,6 @@ this is a picture that i found on the internet that describes almost the same  l
 https://rosbee.googlecode.com/svn/wiki/dsODO_FC_DeadReckoning.gif
 
 At this point the robot cant make a corner, due to hardware limitations, so we haven't implemented this state yet.
-https://rosbee.googlecode.com/svn/wiki/Odometry.gif
 
   * driving in a straight line
    this is the simplest calculation, we just look at the distance that is travelled by one wheel. code-wise i have implemented it like this:
@@ -107,11 +106,21 @@ if (fabs(r-l) <= MARGIN) {
 }}}
 
   * pivoting 
+ {{{
+double dtheta = (r-l)/WHEELBASE;
+		theta =  fmodf((theta+dtheta),(2*M_PI));
+		CosPrev=cosf(theta); // for the next cycle
+    SinPrev=sinf(theta);
+		ROS_DEBUG_NAMED("Odometry","===Pivoting===");	
+}}}
+
   * making a corner
+  not implemented yet
 
 ===Setting up an TF-Tree===
 
 first we needed a transform model of the robot,TF tree. a TF tree give us information about relative positions and rotations. as you probably know a tf tree is chain with transforms that have one parent but can have multiple child's. 
-in the picture above you see also an example of the tf tree of the rosbee robot.
+in the picture above(rviz window) you see also an example of the tf tree of the rosbee robot.
 as you can see in the left panel an tree has only one topframe, in this case /map. the /map frame has 1 child /odom wich has also an child /base_link. /base_link frame is an important frame. this frame mostly represents the center point of the robot.We also have 2 wheel frames, a laser frame  and a kinect frame. 
-//todo
+
+code wise it looks like this:
