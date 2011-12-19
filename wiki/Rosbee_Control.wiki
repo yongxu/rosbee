@@ -10,12 +10,40 @@ the rosbee_control package contains the following launch files:
   * pc_launch.launch
   * mapping_launch.launch
 
-
 === rosbee.launch === 
-rosbee.launch is the launch file to bring up the robot. the launch file starts the following nodes: odometry, move_platform and the kinect or laser. to select the kinect or laser you will need to uncomment there lines. both the laser and kinect can be used at the same time.
+rosbee.launch is the launch file to bring up the robot. the launch file starts the following nodes: odometry, move_platform and the kinect or laser.
+the line for the laser is: 
+{{{
+<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
+}}}
+the line for the kinect is:
+{{{
+<include file="$(find pointcloud_to_laserscan)/launch/kinext_laser_2.launch" />
+}}}
+
+to select the kinect or laser you will need to uncomment there lines. both the laser and kinect can be used at the same time.
 
 ===pc_launch.launch===
 pc_launch.launch runs everything from the navigation stack. but only works if you have a map of the area. (as it doesnt start the gmapping node).
 this launch file want to get the location of the map of the area you are going to drive in. to specify the location for the map you will need to start the launch file in the following way: 
-<code language="bash">roslaunch rosbee_control pc_launch.launch map:=<location of your map></code>
-when no launch file is specified it will start the navigation stack with a map of the mechatronica lab but because this is quite an old map we dont suggest you use it.
+{{{
+roslaunch rosbee_control pc_launch.launch map:=<location of your map>
+}}}
+when no map(yaml) file is specified it will start the navigation stack with a map of the mechatronica lab(not recommended)
+
+===mapping_launch.launch===
+mapping_launch.launch is the launch file that we normally use for testing. it will start everything that is needed to make a map(except the robot it self) and a teleop keyboard, which allows you to send commands to the robot with the qwe and s keys.
+
+when you run this launch file you will notice rviz starting. when you see the costmap being shown in rviz everything is done starting.
+
+=move_platform=
+
+the move_platform node allows us to control the platform with ros messages. it listens on the topic "/cmd_vel" (the default ros topic for move commands) and publishes encoder values on the "/enc" topic.
+
+===communicating with the platform===
+to communicate with the platform we use a serial connection. on this serial connection we send PWM values that the platform has to use. after every send of PWM values the platform responds with its current encoder values.
+for communication with the platform we use the following protocol 
+{{{
+$(leftpwm);(rightpwm)#
+}}}
+where (leftpwm) is the pwm value for the left wheel and (rightpwm) is the pwm value for the right wheel
