@@ -42,8 +42,32 @@ the move_platform node allows us to control the platform with ros messages. it l
 
 ===communicating with the platform===
 to communicate with the platform we use a serial connection. on this serial connection we send PWM values that the platform has to use. after every send of PWM values the platform responds with its current encoder values.
-for communication with the platform we use the following protocol 
+for communication with the platform we use the following protocol. 
 {{{
 $(leftpwm);(rightpwm)#
 }}}
 where (leftpwm) is the pwm value for the left wheel and (rightpwm) is the pwm value for the right wheel
+
+the platform answers the with the encoder values according to the following protocol.
+{{{
+$(leftencoder);(rightencoder)#
+}}}
+again (leftencoder) is the encoder value of the left wheel, (rightencoder) is the value of the right wheel.
+
+===move_platform.cpp===
+move_platform.cpp is the main file of the move_platform nodes. it sets up the services and the subscriber to cmd_vel.
+the while loop in move_platform.cpp also makes sure that the platform is updated at at least 5 hertz. it does so by checking if it has been more than 200ms since the last receive, if so it sends a 0 value to the platform making it stop.
+
+===the platform class===
+the platform class implements the communication with the platform.
+because we had a couple of revisions in the platform we have a couple of different version of the platform class, they all use the same functions but the implementation is different and some functions might not be supported.
+the following versions of the Platform class exist:
+ * xbee Platform: can be found in the xbeeplatform tag
+ * wired Platform: last update was on r99.
+ * revised wired Platform: on the laptop to be added
+
+====xbee Platform====
+the xbee platform was the first version of the platform. it communicated with the laptop over xbee. the xbee was cause for a lot of instability thats why this version included a restriction on command speed (5 hz max (platform could handle 8 but we wanted to be on the save side)) it also had a thread dedicated to reading the messages from the platform to prevent messages being lost (if a message wasnt read right away it was lost as the xbee connection didnt seem to be buffered).
+
+====wired Platform====
+after a while we replaced the xbee connection to the laptop with an serial connection between the robot and the laptop. this gave us a more stable connection. unfortunately the speed of the platform didnt improve. at this version of the platform we were still communicating at 5-8 hertz
