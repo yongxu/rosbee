@@ -16,4 +16,6 @@ rosbee.launch is the launch file to bring up the robot. the launch file starts t
 
 ===pc_launch.launch===
 pc_launch.launch runs everything from the navigation stack. but only works if you have a map of the area. (as it doesnt start the gmapping node).
-this launch file want to get the location of the map of the area you are going to drive in. to specify the location for the map you will need to start the launch file in the following way: "roslaunch rosbee_control pc_launch.launch map:=<location of your map>". when no launch file is specified it will start the navigation stack with a map of the mechatronica lab but because this is quite an old map we dont suggest you use it.
+this launch file want to get the location of the map of the area you are going to drive in. to specify the location for the map you will need to start the launch file in the following way: 
+<code language="bash">roslaunch rosbee_control pc_launch.launch map:=<location of your map></code>
+when no launch file is specified it will start the navigation stack with a map of the mechatronica lab but because this is quite an old map we dont suggest you use it.
