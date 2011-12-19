@@ -30,8 +30,8 @@ If you can ping from the robot to your desktop and vise versa your ok.
 {{{
 sudo nano ~/.bashrc
 }}} 
-scroll to the bottom and check if you find a line that loads the ros's setup.bash.
-in diamondback:
+ scroll to the bottom and check if you find a line that loads the ros's setup.bash.
+ in diamondback:
 {{{
 source /opt/ros/diamondback/setup.bash
 }}}
@@ -42,13 +42,13 @@ source /opt/ros/diamondback/setup.bash
 svn checkout https://rosbee.googlecode.com/svn/trunk/ rosbee --username <username>
 }}}
 
- the simplest way is to checkout in the ROS_PACKAGE_PATH (echo $ROS_PACKAGE_PATH, to see whats your path). if your stack is not located in this path, ros wont be able to find our rosbee package.an other option is to add an custom path to the ROS_PACKAGE_PATH (export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:yourpath)
+ the simplest way is to checkout in the ROS_PACKAGE_PATH (echo $ROS_PACKAGE_PATH, to see whats your path). if your stack is not located in this path, ros wont be able to find our rosbee package.an other option is to add an custom path to the ROS_PACKAGE_PATH (export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:yourpath) add this line of code to your bash script if you dont want to execute this line every time you open a terminal.
 
   * the trunk
  in the svn repository you will find 3 important packges , rosbee_control, rosbee_tf and rosbee_param. rosbee_control contains sources for controlling the motors and for reading encoders, to be more precisely the rosbee_control stack interfaces with the paralax board. more info at [http://code.google.com/p/rosbee/wiki/Rosbee_Control Rosbee_Control]. the rosbee_tf contains sources that will calculate tranforms,poses and odometry. the robot uses this data to to navigate. more info at [http://code.google.com/p/rosbee/wiki/Odometry Rosbee_Odometry]. the rosbee_param package is basically an list with parameters to configure the navigation stack in the correct way so it matches with properties of the robot.
 
   * compile the code
-compiling of the code is easy. open an Terminal and run command: 
+ compiling of the code is easy. open an Terminal and run command: 
 {{{
 rosmake rosbee_control rosbee_tf --pre-clean --rosdep-install
 }}}
@@ -58,7 +58,25 @@ rosmake rosbee_control rosbee_tf --pre-clean --rosdep-install
 {{{
 sudo nano ~/.bashrc
 }}} 
-scroll all the way down and add the following line:
+ scroll all the way down and add the following line:
 {{{
 export ROS_IP=192.168.1.146
 }}}
+
+  * ssh
+ tip: install openssh server on the netbook. this way you dont have to crouch for controlling the netbook.
+
+  * kinect or laser scanner
+  //TODO
+
+===Hardware===
+
+there is nothing special about connecting the hardware to the netbook with usb. Only make sure that the paralax board is connected to the robot first. if you used other hardware or mounted components on a different position you may want to check if they match with the source code. if you open /rosbee_tf/src/rosbeetf.cpp you should see a couple defines. 
+  
+==Setting up the Desktop==
+follow the same steps as with the netbook. Also we need to add an extra line to our bashrc script. Because we need to know wich ROSsystem is the master. we decided that the netbook will be the ROS_MASTER. add the following extra line the your bashrc script:
+{{{
+export ROS_MASTER_URI=http://192.168.1.146:11311
+}}}
+
+follow the instructions on the [http://code.google.com/p/rosbee/wiki/QuickGuide QuickGuide] to start the nodes.
