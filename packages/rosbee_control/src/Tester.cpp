@@ -38,7 +38,7 @@ void move(const geometry_msgs::Twist::ConstPtr& msg)
 int main(int argc, char** argv)
 {
 	char readchar = 0;
-	int movespeed,movedir;
+	float movespeed,movedir;
 	int enable_in;
 	//init ros stuff
 	ros::init(argc,argv,"tester");

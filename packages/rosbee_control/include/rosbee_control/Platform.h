@@ -25,6 +25,13 @@
 #define NRMSGS 10 //size of the rotating read buffer
 #define NRWRITEMSGS 10 //size of the rotating write buffer
 #define WRITEFREQ 8
+#define WHEELBASE 0.41
+#define MINVALUE 1001.0
+#define MAXVALUE 1999.0
+#define MAXDIVIDER 4.82
+#define FACTOR ((MAXVALUE-MINVALUE)/MAXDIVIDER)
+#define CORR 20
+#define READTIMEOUT 20000
 
 using namespace std;
 
@@ -39,7 +46,7 @@ public:
 
 	/*** PLATFORM CONTROL ***/
 	//move the platform
-	void move(int8_t speed,int8_t dir);
+	void move(float speed,float dir);
 	//enables/disables movement on the robot
 	void Enable_motion(bool enable);
 	//enables/disables pc controll
@@ -59,9 +66,11 @@ public:
 	//connects to the robot on device
 	bool connect(const char* device);
 
+	void setNoodstop(bool stop);
+
 
 	int ussensor[10];
-	uint16_t encoders[2];
+	int encoders[2];
 
 	//query status vars.
 	int Movemode,Lastalarm,Xbeetime,Ppcgetcntr,Platenable,Pcenable,Pfstatus,Maincntr,Safetycntr,Version;
@@ -79,34 +88,37 @@ private:
 	ros::Publisher pub;
 
 	//writes message with size size to the platform
-	bool write_to_platform(char* message,int size);
+	//bool write_to_platform(char* message,int size);
 	//reads at most size chars from the platform.
 	bool read_from_platform(char* buffer,int size);
 
-	void addwritelist(char* message,int size);
+//	void addwritelist(char* message,int size);
 
-	static void* readloop();
-	static void* handlexbee();
-	static void* writeloop();
+//	static void* readloop();
+//	static void* handlexbee();
+//	static void* writeloop();
 
 	LightweightSerial *lwserialcon;
 
-	boost::thread* breadthread;
-	boost::thread* bxbeethread;
-	boost::thread* bwritethread;
+//	boost::thread* breadthread;
+//	boost::thread* bxbeethread;
+//	boost::thread* bwritethread;
 
-	char readbuffer[NRMSGS][MSGLENGHT];
-	char writebuffer[NRWRITEMSGS][MSGLENGHT];
-	int readwindex;
-	int writewindex;
+//	char readbuffer[NRMSGS][MSGLENGHT];
+//	char writebuffer[NRWRITEMSGS][MSGLENGHT];
+//	int readwindex;
+//	int writewindex;
 
 	/*** read functions ***/
 	void handle_encoder(char* command);
-	void handle_status(char* command);
-	void handle_ultrasoon(char* command);
+//	void handle_status(char* command);
+//	void handle_ultrasoon(char* command);
 	/*** end read functions ***/
+	
+	void convertor(float x, float rz, int* l, int* r);
 
 	bool connected;
+	bool Noodstop;
 
 protected:
 
