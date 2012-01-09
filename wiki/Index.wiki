@@ -14,3 +14,5 @@
 *[http://code.google.com/p/rosbee/wiki/QuickGuide Quick Guide]
 
 *[http://code.google.com/p/rosbee/wiki/SetupGuide Setup]
+
+*[http://code.google.com/p/rosbee/wiki/Recommendations Recommendations]
