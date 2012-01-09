@@ -5,7 +5,9 @@
 
 *[http://code.google.com/p/rosbee/wiki/Rosbee Rosbee]
 
-*[http://code.google.com/p/rosbee/wiki/Odometry Odometry]
+*[http://code.google.com/p/rosbee/wiki/Odometry Rosbee_Tf]
+
+*[http://code.google.com/p/rosbee/wiki/Rosbee_Control Rosbee_Control]
 
 *[http://code.google.com/p/rosbee/wiki/chrony Chrony]
 
