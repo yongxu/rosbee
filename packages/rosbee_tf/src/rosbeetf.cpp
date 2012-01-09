@@ -12,12 +12,12 @@
 
 #define WHEELBASE 			       0.41
 #define FULLCIRCLEPULSE		     36.0
-#define OMTREKWHEEL			       (2.0* M_PI*(0.153/2.0))
+#define CIRCUMFERENCEWHEEL     (2.0* M_PI*(0.153/2.0))
 #define DISTANCEBASETOSCANNER  0.155,0,0.155
 #define DISTANCEBASETOLASER    0.155,0,0.105
 #define DISTANCEBASETORWHEEL   0,-0.205,0
 #define DISTANCEBASETOLWHEEL   0,0.205,0
-#define MARGIN								 0.02
+#define MARGIN								 0.005
 
 
 double prevEncR,prevEncL,encR,encL;
@@ -49,7 +49,7 @@ void publishOdomMessage(geometry_msgs::PoseStamped pose){
 	//calculate velocity
 	vx = (delx/1000000000.0) * ((float)delt.nsec);
 	vy = (dely/1000000000.0) * ((float)delt.nsec);
-	vth= (delth/1000000000.0) *((float)delt.nsec);
+	vth= (delth/1000000000.0)* ((float)delt.nsec);
 
 	//set the velocity
 	odom.child_frame_id = "base_link";
@@ -96,21 +96,21 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 	
 	double theta =0;
 	double posx=0,posy=0;
-	double CosNow=0,SinNow=0;
+	//double CosNow=0,SinNow=0;
 
 	if (fabs(r-l) <= MARGIN) {
 		posy = ((l+r)/2) * SinPrev;
 		posx =((l+r)/2) * CosPrev;	
 		ROS_DEBUG_NAMED("Odometry","===Straight Line===");	
 	}
-	else if(fabs(r+l) <= MARGIN){
+	else {
 		double dtheta = (r-l)/WHEELBASE;
 		theta =  fmodf((theta+dtheta),(2*M_PI));
 		CosPrev=cosf(theta); // for the next cycle
     SinPrev=sinf(theta);
 		ROS_DEBUG_NAMED("Odometry","===Pivoting===");	
 	}
-	else{
+	/*else{
 		double dtheta = (r-l)/WHEELBASE;
 		theta =  fmodf((theta+dtheta),(2*M_PI));
 		CosNow=cosf(theta);
@@ -120,8 +120,7 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
    double Radius=(WHEELBASE/2)*((r+l)/(r-l));
     posx=Radius*(SinNow-SinPrev);
     posy=Radius*(CosPrev-CosNow);
-
-		}
+		} */
 			//make posestamped message
 		geometry_msgs::PoseStamped posestamp;
 		posestamp.header.frame_id ="base_link";
@@ -134,120 +133,6 @@ geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
 
 		return posestamp;
 }
-/*
-geometry_msgs::PoseStamped calculatePlatformPose(double l, double r) {
-
-	double Lx = -WHEELBASE/2.0;
-	double Ly = 0.0;
-	double Rx = WHEELBASE/2.0;
-	double Ry = 0.0;
-	double theta =0;
-
-	if (fabs(r-l) <= MARGIN) {
-		// If both wheels moved about the same distance, then we get an infinite
-		// radius of curvature.  This handles that case.
-
-		//// find forward by rotating the axle between the wheels 90 degrees
-		//double axlex = Rx - Lx;
-		//double axley = Ry - Ly;
-    //
-		//double forwardx, forwardy;
-		//forwardx = -axley;
-		//forwardy = axlex;
-    //
-		//// normalize
-		//double length = sqrt(forwardx*forwardx + forwardy*forwardy);
-		//forwardx = forwardx / length;
-		//forwardy = forwardy / length;
-
-		//// move each wheel forward by the amount it moved
-		//Lx = Lx + forwardx * l;
-		//Ly = Ly + forwardy * l;
-
-		//Rx = Rx + forwardx * r;
-		//Ry = Ry + forwardy * r;
-	}
-	else
-	{
-		//temporary solution. prevention for dividing 0.
-		if(r == 0)
-		{
-			r= 0.00000001;
-		}
-		if(l == 0)
-		{
-			l= 0.00000001;
-		}
-
-		double rl; // radius of curvature for left wheel
-		rl = WHEELBASE * l / (r - l);
-
-		ROS_DEBUG_NAMED("Odometry","Radius of curvature (left wheel): %.2lf", rl);
-
-		// angle we moved around the circle, in radians
-		theta = 2.0 * M_PI * (l / (2.0 * M_PI * rl));
-
-		ROS_DEBUG_NAMED("Odometry","Theta: %.2lf radians", theta);
-
-		// Find the point P that we're circling
-		double Px, Py;
-
-		Px = Lx + rl*((Lx-Rx)/WHEELBASE);
-		Py = Ly + rl*((Ly-Ry)/WHEELBASE);
-
-		ROS_DEBUG_NAMED("Odometry","Center of rotation: (%.2lf, %.2lf)", Px, Py);
-
-		// Translate everything to the origin
-		double Lx_translated = Lx - Px;
-		double Ly_translated = Ly - Py;
-
-		double Rx_translated = Rx - Px;
-		double Ry_translated = Ry - Py;
-
-		ROS_DEBUG_NAMED("Odometry","Translated: (%.2lf,%.2lf) (%.2lf,%.2lf)",
-				Lx_translated, Ly_translated,
-				Rx_translated, Ry_translated);
-
-		// Rotate by theta
-		double cos_theta = cos(theta);
-		double sin_theta = sin(theta);
-
-		ROS_DEBUG_NAMED("Odometry","cos(theta)=%.2lf sin(theta)=%.2lf", cos_theta, sin_theta);
-
-		double Lx_rotated = Lx_translated*cos_theta - Ly_translated*sin_theta;
-		double Ly_rotated = Lx_translated*sin_theta + Ly_translated*sin_theta;
-
-		double Rx_rotated = Rx_translated*cos_theta - Ry_translated*sin_theta;
-		double Ry_rotated = Rx_translated*sin_theta + Ry_translated*sin_theta;
-
-		ROS_DEBUG_NAMED("Odometry","Rotated: (%.2lf,%.2lf) (%.2lf,%.2lf)",
-				Lx_rotated, Ly_rotated,
-				Rx_rotated, Ry_rotated);
-
-		// Translate back
-		Lx = Lx_rotated + Px;
-		Ly = Ly_rotated + Py;
-
-		Rx = Rx_rotated + Px;
-		Ry = Ry_rotated + Py;
-	}
-
-	//make posestamped message
-	geometry_msgs::PoseStamped posestamp;
-	posestamp.header.frame_id ="base_link";
-	posestamp.header.stamp = ros::Time(0);
-	posestamp.pose.position.y = ((Lx+Rx)/2.0);
-	posestamp.pose.position.x = ((Ly+Ry)/2.0);
-	posestamp.pose.position.z = 0;
-	posestamp.pose.orientation = tf::createQuaternionMsgFromYaw(theta); 
-
-	ROS_DEBUG_NAMED("Odometry"," new Platform pose generated! pose= x:%f y:%f z:%f orientation= x:%f y:%f z:%f w:%f",posestamp.pose.position.x,
-			posestamp.pose.position.y,posestamp.pose.position.z,posestamp.pose.orientation.x,posestamp.pose.orientation.y,
-			posestamp.pose.orientation.z,posestamp.pose.orientation.w);
-
-	return posestamp;
-} */
-
 
 geometry_msgs::PoseStamped transformPose(geometry_msgs::PoseStamped pose){
 
@@ -257,7 +142,7 @@ geometry_msgs::PoseStamped transformPose(geometry_msgs::PoseStamped pose){
 
 	try{
 		listener->transformPose("odom", pose, odom_point);
-		ROS_DEBUG_NAMED("TF","new pos for base  x=%f y=%f",odom_point.pose.position.z, odom_point.pose.position.y);
+		ROS_DEBUG_NAMED("Odometry","new pos for base  x=%f y=%f th=%f" ,odom_point.pose.position.z, odom_point.pose.position.y,tf::getYaw(odom_point.pose.orientation));
 
 	}
 	catch(tf::TransformException& ex){
@@ -266,7 +151,7 @@ geometry_msgs::PoseStamped transformPose(geometry_msgs::PoseStamped pose){
 	}
 	
 	//save prevpose
-	prevpose = pose;
+
 
 	return odom_point;
 }
@@ -298,9 +183,17 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	double dell = msg->leftEncoder -  prevEncL;
 	ROS_DEBUG_NAMED("Odometry","delta r:%f pulses,delta l:%f pulses",delr,dell);
 
+	if(delr < -60000 || delr > 60000 || dell < -60000 || dell > 60000)
+	{
+	
+		prevEncR = msg->rightEncoder;
+		prevEncL = msg->leftEncoder;
+			return;  
+	}
+
 	//calculate the distance the wheels have traveled, compared to last measurement.
-	double right = (OMTREKWHEEL*delr)/FULLCIRCLEPULSE;
-	double left = (OMTREKWHEEL*dell)/FULLCIRCLEPULSE;
+	double right = (CIRCUMFERENCEWHEEL*delr)/FULLCIRCLEPULSE;
+	double left = (CIRCUMFERENCEWHEEL*dell)/FULLCIRCLEPULSE;
 	ROS_DEBUG_NAMED("Odometry","New distance: left wheel:%lfm right wheel:%lfm",left,right);
 
 	//calculate the wheelangle from both encoders for tf in radian.(can be optimized).
@@ -320,12 +213,11 @@ void enc(const rosbee_control::encoders::ConstPtr& msg)
 	//publish Odom message
 	publishOdomMessage(pose); //TODO
 
-	
-
 	//save the encoder values for next call
 	prevEncR = msg->rightEncoder;
 	prevEncL = msg->leftEncoder;
 
+	prevpose = pose;
  ROS_DEBUG_NAMED("Odometry"," ");
 }
 
@@ -352,15 +244,20 @@ int main(int argc, char **argv) {
 
 	//init variables
 	encR=encL=prevEncL=prevEncR=0;
+  prevpose = geometry_msgs::PoseStamped();
+	prevpose.pose.position.x = 0;
+	prevpose.pose.position.y = 0;
+	prevpose.pose.position.z = 0;
+	prevpose.pose.orientation = tf::createQuaternionMsgFromYaw(2);
 
 	//subscribe to encoders. every time an encoder value is published over ROS the enc method is called.
 	//we need this values to calculate the position/speed of the platform.
-	ros::Subscriber subx = n.subscribe("/enc",10,enc);
+	ros::Subscriber subx = n.subscribe("/enc",1,enc);
 
 	//ros Publisher.will be used later when odomerty information is calculated.
 	//you need to initiaze this publisher in the main or else it wont work.
 	odom_pub = new ros::Publisher();
-	*odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
+	*odom_pub = n.advertise<nav_msgs::Odometry>("odom", 1);
 
 	//transform listener. will be used later
 	listener = new tf::TransformListener(n);
