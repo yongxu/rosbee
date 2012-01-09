@@ -40,9 +40,84 @@ when you run this launch file you will notice rviz starting. when you see the co
 
 the move_platform node allows us to control the platform with ros messages. it listens on the topic "/cmd_vel" (the default ros topic for move commands) and publishes encoder values on the "/enc" topic.
 
-===communicating with the platform===
-to communicate with the platform we use a serial connection. on this serial connection we send PWM values that the platform has to use. after every send of PWM values the platform responds with its current encoder values.
-for communication with the platform we use the following protocol. 
+==communicating with the platform==
+to communicate with the platform we use a serial connection. we have used 2 communication protocols, the one the original platform used and a simplified version. right now we use the simplified version of the protocol.
+
+===original protocol===
+all the commands in the original protocol are plain text and use the following common syntax:
+{{{
+$(command number),(command parameters)<CR>#<EOT>
+}}}
+where (command number) is the number representing the command, and (command parameters) are the parameters for that specific command. parameters are separated by comas. 
+`<CR>` represents a carriage return (ascii 13)
+`<EOT>` represents an end of transmission (ascii 4) 
+
+====900 move command====
+sets the platform to move at the given speeds.
+{{{
+$900,cntr,speed,dir<CR>#<EOT>
+}}}
+cntr, is a counter which will increase with 1 every move command <br>
+speed, is the forward speed for the platform in the range [-128..127] <br>
+dir, is the directional speed for the platform in the range [-128..127]
+====901 enable motion====
+enables motion by the platform.
+{{{
+$901,Enable<CR>#<EOT>
+}}}
+Enable, value: 1 means motion will be enabled, 0 means motion will be disabled. any other values are invalid.
+====902 enable pc control====
+enables pc control on the platform.
+{{{
+$902,Enable<CR>#<EOT>
+}}}
+Enable, value: 1 means pc control will be enabled, 0 means pc control will be disabled. any other values are invalid.
+====908 clear errors====
+clears all current set errors on the platform.
+{{{
+$908<CR>#<EOT>
+}}}
+====909 enable US sensors====
+enables the US sensors on the platform
+{{{
+$909,Enable<CR>#<EOT>
+}}}
+Enable, value: 1 means the US sensors will be enabled, 0 means that the US sensors will be disabled. any other values are invalid.
+====911 query wheel position====
+requests the current encoder values
+{{{
+$911<CR>#<EOT>
+}}}
+reply:
+{{{
+$911,wheel1,wheel2,<CR>#<EOT> 
+}}}
+wheel1, is the encoder value of wheel1, as an unsigned 16 bit int (uint16).<BR>
+wheel2, is the encoder value of wheel2, as an unsigned 16 bit int (uint16).
+====912 query us sensors====
+requests the last measured distance from the US sensors
+{{{
+$912<CR>#<EOT>
+}}}
+reply:
+{{{
+$912,sensor0,sensor1,sensor2,sensor3,sensor4,sensor5,sensor6,sensor7,sensor8,sensor9,<CR>#<EOT>
+}}}
+sensor#, is the encoder value of sensor#, as an 32 bit int (int32).
+====913 query status====
+requests the current status of the platform
+{{{
+$913<CR>#<EOT>
+}}}
+reply:
+{{{
+$912,MoveMode,LastAlarm,XbeeTime,getCntr,Enabled,PcEnable,PfStatus,MainCntr,SafetyCntr,Version<CR>#<EOT>
+}}}
+
+
+===simplified protocol=== 
+in the simplified protocol we only send the PWM values the platform has to use. after every set of PWM values the platform responds with its current encoder values.
+for sending the PWM values we use the following protocol.
 {{{
 $(leftpwm);(rightpwm)#
 }}}
@@ -54,11 +129,11 @@ $(leftencoder);(rightencoder)#
 }}}
 again (leftencoder) is the encoder value of the left wheel, (rightencoder) is the value of the right wheel.
 
-===move_platform.cpp===
+==move_platform.cpp==
 move_platform.cpp is the main file of the move_platform nodes. it sets up the services and the subscriber to cmd_vel.
 the while loop in move_platform.cpp also makes sure that the platform is updated at at least 5 hertz. it does so by checking if it has been more than 200ms since the last receive, if so it sends a 0 value to the platform making it stop.
 
-===the platform class===
+==the platform class==
 the platform class implements the communication with the platform.
 because we had a couple of revisions in the platform we have a couple of different version of the platform class, they all use the same functions but the implementation is different and some functions might not be supported.
 the following versions of the Platform class exist:
@@ -66,13 +141,13 @@ the following versions of the Platform class exist:
  * wired Platform: last update was on r99.
  * revised wired Platform: on the laptop to be added
 
-====xbee Platform====
+===xbee Platform===
 the xbee platform was the first version of the platform. it communicated with the laptop over xbee. the xbee was cause for a lot of instability thats why this version included a restriction on command speed (5 hz max (platform could handle 8 but we wanted to be on the save side)) it also had a thread dedicated to reading the messages from the platform to prevent messages being lost (if a message wasnt read right away it was lost as the xbee connection didnt seem to be buffered).
 
-====wired Platform====
+===wired Platform===
 after a while we replaced the xbee connection(between the robot and the laptop) with an serial connection. this gave us a more stable connection. unfortunately the speed of the platform didnt improve. at this version of the platform we were still communicating at 5-8 hertz
 
-====revised wired platform====
+===revised wired platform===
 this is the final verion of the platform. for this version we have rewritten the software of the platform it self, and introduced a greatly reduced version of the communication protocol. this version of the platform responds at an high speed and makes it possible to work at over 50 hertz. 
 this version of the platform also contains the least functionalities, it only allows you to set the speed with which the platform should move.
 to make sure the published encoder values stay up to date the node will, when it hasnt send a command to the platform for 200ms, resend the previous command. the node also have a build in timeout in waiting for a reply, to make sure package loss wont crash the node, locking it in its read cycles. 
