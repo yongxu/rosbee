@@ -1,4 +1,6 @@
 #summary the setup and thought process behind the move_platform node
+=Rosbee_control=
+<wiki:toc max_depth="3" /> 
 
 = Introduction =
 on this page we will try to explain the setup of the rosbee_control package and the move_platform node.
