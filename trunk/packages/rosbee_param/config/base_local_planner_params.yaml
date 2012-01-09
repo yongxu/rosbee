@@ -22,20 +22,23 @@ TrajectoryPlannerROS:
 #max linear speed
   max_vel_x: 2.0
 #min liner speed
-  min_vel_x: 2.0
-  max_vel_th: 2.0
-  acc_lim_th: 1.0
-  acc_lim_x: 1.0
-  acc_lim_y: 1.0
+  min_vel_x: 1.0
+  max_vel_th: 1.5
+  acc_lim_th: 3.0
+  acc_lim_x: 3.0
+  acc_lim_y: 0.0
 #weird (base planner documentation tells about max_rotational_vel)
-  min_vel_th: 2.0
-  min_in_place_vel_th: 2.0
+  min_vel_th: 1.0
+  min_in_place_vel_th: 0.5
+  min_in_place_rotational_vel: 0.5
+
+  escape_vel: -1.0
 
 #goal tolerance parameters
-  xy_goal_tolerance: 0.5
-  yaw_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.4
+  yaw_goal_tolerance: 0.5
   goal_distance_bias: 0.8
-  path_distance_bias: 0.6
+  path_distance_bias: 1.0
   occdist_scale: 0.01
 
 #how far to look ahead when scoring different in-place-rotation trajectories
@@ -54,3 +57,5 @@ TrajectoryPlannerROS:
 
 #I have no idea what this does
   simple_attractor: false
+
+  controller_frequency: 10.0
