@@ -133,7 +133,8 @@ Enabled, values: 0 motion is disabled, 1 motion is enabled<BR>
  8. `NoAlarmBit`, No alarm present <BR>
 `MainCntr`, mainloop counter <BR>
 `SafetyCntr`, safety counter<BR>
-Version, platform version number<BR>
+Version, platform version number<BR><BR>
+
 
 ===simplified protocol=== 
 in the simplified protocol we only send the PWM values the platform has to use. after every set of PWM values the platform responds with its current encoder values.
