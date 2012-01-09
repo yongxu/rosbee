@@ -28,6 +28,16 @@ what we first did was to make sure that we can read encoder values from the para
 after the encoder values are obtained, we translate the incoming encoder-pulses to a distance. which we can calculate Odometry with.
 the last step is to publish some messages over ROS. If you look at the specification of the navigation stack, the move_base node to be exactly, you see that in order to get navigation working you need to publish 2 types of messages. a TF message and an Odomety message. 
 
+Node [/tfbroadcaster]
+Publications: 
+ * /rosout [rosgraph_msgs/Log]
+ * /tf [tf/tfMessage]
+ * /odom [nav_msgs/Odometry]
+
+Subscriptions: 
+ * /enc [rosbee_control/encoders]
+ * /tf [tf/tfMessage]
+
 ===Read Encoders===
 to get information about encoders you first need to get the rosbee_control stack up and running. this stack publishes encoder values over ROS in the format descriped in rosbee_control/msg/encoders.msg. Because of some computing limitations of the paralax we only can publish encoder values at a rate of  max 10hz. another problem is if we sample at that rate the delta of the encoder pulses will be 0. this due a low resolution of the encoders on the wheel. below i have posted some code from the rosbee_tf source, i left the unimportant parts blank. 
  
