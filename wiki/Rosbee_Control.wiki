@@ -113,7 +113,25 @@ reply:
 {{{
 $912,MoveMode,LastAlarm,XbeeTime,getCntr,Enabled,PcEnable,PfStatus,MainCntr,SafetyCntr,Version<CR>#<EOT>
 }}}
-
+MoveMode, values: 0 means manual mode, 1 means US sensor control.<BR>
+LastAlarm, contains the last error.<BR>
+XbeeTime, XbeeTime/80000 is the time of the Xbeecomm in ms<BR>
+getCntr, HB52 counter<BR>
+Enabled, values: 0 motion is disabled, 1 motion is enabled<BR>
+PcEnable, values: 0 pc control is disabled, 1 pc control is enabled<BR>
+PfStatus, status bits values:
+ 0. Serialbit, 0= Serial Debug of 1= Serial pdebug port on <BR>
+ `1.` USAlarm, US alarm bit: 1= object detected in range <BR>
+ 2. PingBit, 0= Ping off 1= Ping on <BR>
+ 3. EnableBit, 0= Motion DisablePfd 1= Motion enabled <BR>
+ 4. PCEnableBit, PC Enable -> Pf Enable <BR>
+ 5. PCControlBit, PC In control <BR>
+ 6. CommCntrBit, Xbee Timout error <BR>
+ 7. MotionBit, Platform moving <BR>
+ 8. NoAlarmBit, No alarm present <BR>
+MainCntr, mainloop counter <BR>
+SafetyCntr, safety counter<BR>
+Version, platform version number<BR>
 
 ===simplified protocol=== 
 in the simplified protocol we only send the PWM values the platform has to use. after every set of PWM values the platform responds with its current encoder values.
