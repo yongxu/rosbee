@@ -1,6 +1,9 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <string.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
 using namespace std;
 
 
@@ -10,9 +13,9 @@ using namespace std;
 class UDPServer
 {
 	private:
-		 int sockfd, newsockfd, port;
+		 int sockfd, newsockfd, portnr;
      socklen_t clilen;
-     char buffer[BUFFERLENGHT];
+
      struct sockaddr_in serv_addr, cli_addr;
 
 		bool openSocket()
@@ -23,12 +26,12 @@ class UDPServer
 			 return true;
 		}
 
-	  bool bind()
+	  bool bindServer()
 		{
 			bzero((char *) &serv_addr, sizeof(serv_addr));
      serv_addr.sin_family = AF_INET;
      serv_addr.sin_addr.s_addr = INADDR_ANY;
-     serv_addr.sin_port = htons(port);
+     serv_addr.sin_port = htons(portnr);
      if (bind(sockfd, (struct sockaddr *) &serv_addr,
               sizeof(serv_addr)) < 0) 
              return false;
@@ -50,16 +53,19 @@ class UDPServer
    public:
 		UDPServer(int port)
 		{
-			this.port = port;
+			portnr = port;
 			openSocket();
-			bind();
+			bindServer();
 			AcceptClient();			
 		}
 
 		string readLine()
 		{
-			bzero(buffer,256);
-     n = read(newsockfd,buffer,255);
+      char buffer[BUFFERLENGHT];
+			bzero(buffer,BUFFERLENGHT);
+    	if(read(newsockfd,buffer,BUFFERLENGHT-1) > 0)
+					return string(buffer);
+			return "";
 		}
      
 
@@ -81,7 +87,7 @@ int main(int argc, char * argv[])
 	  geometry_msgs::Twist cmd;
 
 		cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
-    vel_pub_ = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    vel_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
 	
 	return 0;
 }
