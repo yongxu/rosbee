@@ -1,0 +1,5 @@
+#summary One-sentence summary of this page.
+
+= Recommendations =
+
+  * Better encoders. at the moment the encoders of the robot have a resolution of 36 pulses a rotation. this gives problems with calculation of odometry. at the moment we can sample encoder values at +- 5 hz max before the difference with the previous sample is null. the low resolution causes also an problem with navigation. The robot is trying to drive to a certain setpoint but because of the poor resolution it never reaches that point. the robot will be making cirkels until it reaches it setpoint.(what in our case never happend)
