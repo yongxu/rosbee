@@ -70,4 +70,9 @@ the following versions of the Platform class exist:
 the xbee platform was the first version of the platform. it communicated with the laptop over xbee. the xbee was cause for a lot of instability thats why this version included a restriction on command speed (5 hz max (platform could handle 8 but we wanted to be on the save side)) it also had a thread dedicated to reading the messages from the platform to prevent messages being lost (if a message wasnt read right away it was lost as the xbee connection didnt seem to be buffered).
 
 ====wired Platform====
-after a while we replaced the xbee connection to the laptop with an serial connection between the robot and the laptop. this gave us a more stable connection. unfortunately the speed of the platform didnt improve. at this version of the platform we were still communicating at 5-8 hertz
+after a while we replaced the xbee connection(between the robot and the laptop) with an serial connection. this gave us a more stable connection. unfortunately the speed of the platform didnt improve. at this version of the platform we were still communicating at 5-8 hertz
+
+====revised wired platform====
+this is the final verion of the platform. for this version we have rewritten the software of the platform it self, and introduced a greatly reduced version of the communication protocol. this version of the platform responds at an high speed and makes it possible to work at over 50 hertz. 
+this version of the platform also contains the least functionalities, it only allows you to set the speed with which the platform should move.
+to make sure the published encoder values stay up to date the node will, when it hasnt send a command to the platform for 200ms, resend the previous command. the node also have a build in timeout in waiting for a reply, to make sure package loss wont crash the node, locking it in its read cycles. 
