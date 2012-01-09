@@ -74,20 +74,35 @@ class UDPServer
 		   close(newsockfd);
 		   close(sockfd);
 		}
-
 };
 
+void  StringToValue(double * x, double *y,double *z)
+{
+
+}
 
 int main(int argc, char * argv[])
 {
-		ros::init(argc, argv, "tfBroadcaster");
+  	double walk_vel, run_vel, yaw_rate, yaw_rate_run;
+		UDPServer server = UDPServer();
+
+		ros::init(argc, argv, "AndroidKeyboard");
 		ros::NodeHandle n;
 
   	ros::Publisher vel_pub;
 	  geometry_msgs::Twist cmd;
-
+		
 		cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
     vel_pub = n.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-	
+
+		n_private.param("walk_vel", walk_vel, 0.5);
+    n_private.param("run_vel", run_vel, 1.0);
+    n_private.param("yaw_rate", yaw_rate, 1.0);
+    n_private.param("yaw_run_rate", yaw_rate_run, 1.5);
+
+		if(!server.init())
+		return -1;
+		
+		server.close();	
 	return 0;
 }
