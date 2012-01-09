@@ -3,9 +3,9 @@
 	<node name="move_platform" pkg="rosbee_control" type="move_platform" respawn="true" />
 	<node name="tfbroadcaster" pkg="rosbee_tf" type="tfBroadcaster"/>
 	
-	<!-- start the laser -->	
+	<!-- start the laser -->
 	<node name="hokuyo_node" pkg="hokuyo_node" type="hokuyo_node" />
 	
 	<!-- start the kinect -->
-	<include file="$(find pointcloud_to_laserscan)/launch/kinext_laser_2.launch" />
+	<!--<include file="$(find pointcloud_to_laserscan)/launch/kinext_laser_2.launch" />-->
 </launch>

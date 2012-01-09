@@ -13,11 +13,12 @@ Platform* Platform::Pinstance=NULL;
 
 Platform::Platform(ros::NodeHandle n)
 {
+	Noodstop = false;
 	connected = false;
 	pub = n.advertise<rosbee_control::encoders>("enc", 1);
 	lwserialcon = NULL;
-	bzero(readbuffer,NRMSGS*MSGLENGHT);
-	writewindex = 0;
+	//bzero(readbuffer,NRMSGS*MSGLENGHT);
+	//writewindex = 0;
 }
 
 Platform::~Platform()
@@ -26,9 +27,9 @@ Platform::~Platform()
 	{
 		connected = false;
 		lwserialcon->~LightweightSerial();
-		breadthread->join();
+		/*breadthread->join();
 		bxbeethread->join();
-		bwritethread->join();
+		bwritethread->join();*/
 	}
 }
 
@@ -61,41 +62,59 @@ bool Platform::connect(const char* device)
 	}
 	else connected = true;
 
-	ROS_DEBUG_NAMED("readthread","starting read thread.");
+	/*ROS_DEBUG_NAMED("readthread","starting read thread.");
 	breadthread = new boost::thread(&Platform::readloop);
 	ROS_DEBUG_NAMED("xbeethread","starting xbee thread.");
 	bxbeethread = new boost::thread(&Platform::handlexbee);
 	ROS_DEBUG_NAMED("writethread","starting write thread.");
-	bwritethread = new boost::thread(&Platform::writeloop);
+	bwritethread = new boost::thread(&Platform::writeloop);*/
 	//sleep a short while to make sure the thread had time to start.
-	sleep(1);
+	//sleep(1);
 	//if the connection was opened successfully get the status of the platform
-	read_status();
+	//read_status();
 	return connected;
+}
+
+void Platform::setNoodstop(bool stop)
+{
+        Noodstop = stop;
 }
 
 
 /*** platform control ***/
-void Platform::move(int8_t speed,int8_t dir)
+void Platform::move(float speed,float dir)
 {
 	//no need to move if the motion on the platform is disabled
-	if(!motion_enabled || !connected) return;
-	static int count = 0;
+	if(!connected || Noodstop) return;
 
-	ROS_DEBUG_NAMED("platform","move(%i,%i)",speed,dir);
+	int l = 0, r = 0;
+
+	convertor(speed,dir,&l,&r);
+
+	ROS_WARN_NAMED("platform","move(%f,%f)",speed,dir);
 	stringstream ss;
-	ss << MOVE_CMD << ',' << (int)count << ',' << (int)speed << ',' << (int)dir << ',';
-
+	ss << "$" << l << ";" << r << "#";
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	ROS_INFO("writestring: %s",writestring);
+	if(!lwserialcon->write_block(writestring,ss.str().length()))
+	{
+		ROS_INFO("error writing");
+		return;
+	}
 
-	count ++;
+	char readbuffer[16];
+	bzero(readbuffer,16);
+
+	read_from_platform(readbuffer,15);
+	ROS_INFO("donereading %s",readbuffer);
+	handle_encoder(readbuffer);
 }
 
 void Platform::Enable_motion(bool enable)
 {
-	if(!connected) return;
+//throw string("not implemented in this version");
+/*	if(!connected) return;
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","enable_motion(%s)",(enable)?"true":"false");
@@ -106,12 +125,14 @@ void Platform::Enable_motion(bool enable)
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 }
 
 void Platform::pc_control(bool enable)
 {
-	if(!connected) return;
+//throw string("not implemented in this version");
+
+/*	if(!connected) return;
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","enable_motion(%s)",(enable)?"true":"false");
@@ -122,12 +143,14 @@ void Platform::pc_control(bool enable)
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 }
 
 void Platform::clear_error()
 {
-	if(!connected) return;
+//throw string("not implemented in this version");
+
+/*	if(!connected) return;
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","clear_erros()");
@@ -135,12 +158,13 @@ void Platform::clear_error()
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 }
 
 void Platform::set_ultrasoon(bool enable)
 {
-	if(!connected) return;
+//throw string("not implemented in this version");
+/*	if(!connected) return;
 	stringstream ss;
 
 	ROS_DEBUG_NAMED("platform","set_ultrasoon(%s)",(enable)?"true":"false");
@@ -151,12 +175,13 @@ void Platform::set_ultrasoon(bool enable)
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 }
 
 void Platform::read_encoders()
 {
-	if(!connected)
+//throw string("not implemented in this version");
+/*	if(!connected)
 	{
 		ROS_DEBUG_NAMED("platform","read_encoders(),not connected");
 		return;
@@ -167,58 +192,45 @@ void Platform::read_encoders()
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 }
 
 void Platform::read_ultrasoon()
 {
-	if(!connected || ultrasoon_enable) return;
+//throw string("not implemented in this version");
+/*	if(!connected || ultrasoon_enable) return;
 	stringstream ss;
 	ROS_DEBUG_NAMED("platform","read_ultrasoon()");
 	ss << READ_US << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 
 }
 
 void Platform::read_status()
 {
-	if(!connected)return;
+//throw string("not implemented in this version");
+/*	if(!connected)return;
 	stringstream ss;
 	ss << READ_STATUS << ',';
 
 	char writestring[ss.str().length()];
 	strcpy(writestring,ss.str().c_str());
-	addwritelist(writestring,ss.str().length());
+	addwritelist(writestring,ss.str().length());*/
 }
 /*** end platform control ***/
 
-bool Platform::write_to_platform(char* message,int size)
-{
-	//check if we are connected to the platform
-	if(!connected)
-	{
-		ROS_DEBUG_NAMED("serial","serial not connected, when trying to write");
-		return false;
-	}
-	stringstream ss;
-
-	//add "pc$" to the start and a "#\r\0" to the end
-	char tmpmsg[size+6];
-	ss << "PC$" << message << "#\r\0";
-	strcpy(tmpmsg,ss.str().c_str());
-	ROS_DEBUG_NAMED("serial","writing to serial string: \"%s\", tmpmsg: \"%s\"",message,tmpmsg);
-	//write to the platform
-	return lwserialcon->write_block(tmpmsg,size+5);
-}
 
 bool Platform::read_from_platform(char* buffer, int size)
 {
 	/*TODO figure out what to do with incomplete data*///right now: if incomplete buffer didnt change
-
 	//check if we are connected to the platform
+	bool timeout = true;
+	timeval begin,now;
+	gettimeofday(&begin,NULL);
+	gettimeofday(&now,NULL);
 	if(!connected)
 	{
 		ROS_DEBUG_NAMED("serial","serial not connected, when trying to read");
@@ -226,142 +238,53 @@ bool Platform::read_from_platform(char* buffer, int size)
 	}
 
 	//read from the platform
-	int i = 0;
+	int i = 1;
 	char read[size];
 	bzero(read,size);
 
 	ROS_DEBUG_NAMED("serial","starting read, searching for \"$\"");
-	while(read[0] != '$')
+	while(read[0] != '$'  && (timeout = ((begin.tv_usec+READTIMEOUT) > ((now.tv_sec-begin.tv_sec)*1000000 + now.tv_usec))))
 	{
 		if(!lwserialcon->read(read))
-			ROS_WARN_NAMED("serial","reading from serial returned false, while waiting for \'$\'");
+			ROS_DEBUG_NAMED("serial_warn","reading from serial returned false, while waiting for \'$\'");
+		gettimeofday(&now,NULL);
+	}
+	if(!timeout) 
+	{
+		ROS_WARN_NAMED("serial","timeout while waiting for $");
+		return false;
 	}
 
-	while(read[i] != '#' && i < size-1)
+	while(read[i] != '#' && i < size-1  && (timeout = ((begin.tv_usec+READTIMEOUT) > ((now.tv_sec-begin.tv_sec)*1000000 + now.tv_usec))))
 	{
-		if(read[i] != ' ' && read[i] != '\r')
+
+		if(!lwserialcon->read(&read[i]))
 		{
-			i++;
-			read[i] = ' ';
+			ROS_DEBUG_NAMED("serial_warn","reading from serial returned false, while reading the message");
 		}
-		if(!lwserialcon->read(read+i))
-			ROS_WARN_NAMED("serial","reading from serial returned false, while reading the message");
+		else if (read[i] != '#' && read[i] != ' ' && (uint8_t)read[i] != 0)
+		{
+			ROS_DEBUG_NAMED("serial","read: %d, char: %c",(uint8_t)read[i],read[i]);
+			i++;
+		}
+		gettimeofday(&now,NULL);
 	}
 	ROS_DEBUG_NAMED("serial","done reading, received \"%s\"",read);
+	if(!timeout) 
+	{
+		ROS_WARN_NAMED("serial","timeout while reading");
+		return false;
+	}
 	strcpy(buffer,read);
 	return true;
 }
-
-void Platform::addwritelist(char* message,int size)
-{
-	memcpy(writebuffer[writewindex%NRWRITEMSGS],message,size);
-	writewindex++;
-}
-
-void* Platform::writeloop()
-{
-	int lastwriten = 0;
-	stringstream ss;
-
-	ros::Rate writerate(WRITEFREQ); // create rate object to slow the the writing
-	while(Pinstance->connected)
-	{
-		if(lastwriten < Pinstance->writewindex)
-		{
-			lastwriten++;
-			ss << Pinstance->writebuffer[lastwriten%NRWRITEMSGS];
-			if(!Pinstance->write_to_platform(Pinstance->writebuffer[lastwriten%NRWRITEMSGS],ss.str().length()))
-				ROS_WARN_NAMED("serial","write to serial returned false.");
-
-			ss.str(string());
-		}
-		writerate.sleep();
-	}
-	return NULL;
-}
-
-void* Platform::readloop()
-{
-	int i = 0;
-	char read[MSGLENGHT];
-	Pinstance->readwindex = 0;
-	while(Pinstance->connected)
-	{
-		bzero(read,MSGLENGHT);
-		ROS_DEBUG_NAMED("readthread","waiting for \'$\'");
-		while(read[0] != '$' && Pinstance->connected)
-		{
-			if(!Pinstance->lwserialcon->read(read))
-				ROS_WARN_NAMED("serial","reading from serial returned false, while waiting for \'$\'");
-			usleep(10);
-		}
-		ROS_DEBUG_NAMED("readthread","\'$\' found starting read");
-		i = 0;
-		while(read[i] != '#' && i < MSGLENGHT-1 && Pinstance->connected)
-		{
-			if(read[i] != 0 && read[i] != '\r')
-			{
-				i++;
-				read[i] = 0;
-			}
-			if(!Pinstance->lwserialcon->read(read+i))
-				ROS_WARN_NAMED("serial","reading from serial returned false, while reading the message");
-			usleep(10);
-		}
-		ROS_DEBUG_NAMED("readthread","msg read: \"%s\".",read);
-		strcpy(Pinstance->readbuffer[Pinstance->readwindex%NRMSGS],read);
-		Pinstance->readwindex ++;
-	}
-	return NULL;
-}
-
-void* Platform::handlexbee()
-{
-	int readindex=0;
-	char splitmsg[10];
-	while(Pinstance->connected)
-	{
-		if(readindex < Pinstance->readwindex)
-		{
-			ROS_DEBUG_NAMED("xbeethread","handling message: #%i",readindex);
-			bzero(splitmsg,10);
-			memcpy(splitmsg,Pinstance->readbuffer[readindex%NRMSGS]+1,3);
-			switch(atoi(strtok(splitmsg,",")))
-			{
-				case READ_ENCODERS: Pinstance->handle_encoder(Pinstance->readbuffer[readindex%NRMSGS]);
-					break;
-				case READ_STATUS: Pinstance->handle_status(Pinstance->readbuffer[readindex%NRMSGS]);
-					break;
-				case READ_US: Pinstance->handle_ultrasoon(Pinstance->readbuffer[readindex%NRMSGS]);
-					break;
-				default: ROS_DEBUG_NAMED("xbeethread","unknown message: %i",atoi(strtok(Pinstance->readbuffer[readindex%NRMSGS]+1,",")));
-			}
-			readindex++;
-		}
-		usleep(1000);
-	}
-	return NULL;
-}
-
 void Platform::handle_encoder(char* command)
 {
 	rosbee_control::encoders msg;
-	char* tmp;
-	int i = 0;
+//	char* tmp;
+//	int i = 0;
 	ROS_DEBUG_NAMED("xbeethread","handle_encoder(\"%s\")",command);
-
-	if(READ_ENCODERS != atoi(strtok(command+1,",")))
-	{
-		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
-		return;
-	}
-	tmp = strtok(NULL,",");
-	while(tmp != NULL && i < NR_ENCODER)
-	{
-		encoders[i]=atoi(tmp);
-		i++;
-		tmp = strtok(NULL,",");
-	}
+	sscanf(command,"$%d;%d#",&encoders[1],&encoders[0]);
 	ROS_DEBUG_NAMED("xbeethread","encoders 0:%i 1:%i",encoders[0],encoders[1]);
 	msg.leftEncoder = encoders[1];
 	msg.rightEncoder = encoders[0];
@@ -369,58 +292,25 @@ void Platform::handle_encoder(char* command)
 	ROS_DEBUG_NAMED("xbeethread","encoder values published");
 }
 
-void Platform::handle_status(char* command)
+void Platform::convertor(float x, float rz, int* l, int* r)
 {
-	ROS_DEBUG_NAMED("xbeethread","handle_status(\"%s\")",command);
-	char* splitptr;
-	if(READ_STATUS!=atoi(strtok(command+1,",")))
-	{
-		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
-		return;
-	}
+	double rf = 0;
+	double lf = 0;
 
-	if((splitptr = strtok(NULL,",")) != NULL) Movemode = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Movemode");
-	if((splitptr = strtok(NULL,",")) != NULL) Lastalarm = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Lastalarm");
-	if((splitptr = strtok(NULL,",")) != NULL) Xbeetime = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Xbeetime");
-	if((splitptr = strtok(NULL,",")) != NULL) Ppcgetcntr = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Ppcgetcntr");
-	if((splitptr = strtok(NULL,",")) != NULL) Platenable = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Platenable");
-	if((splitptr = strtok(NULL,",")) != NULL) Pcenable = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Pcenable");
-	if((splitptr = strtok(NULL,",")) != NULL) Pfstatus = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Pfstatus");
-	if((splitptr = strtok(NULL,",")) != NULL) Maincntr = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Maincntr");
-	if((splitptr = strtok(NULL,",")) != NULL) Safetycntr = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Safetycntr");
-	if((splitptr = strtok(NULL,",")) != NULL) Version = atoi(splitptr);
-	else ROS_DEBUG_NAMED("xbeethread","failed to extract: %s","Version");
+	rf = x +((/*WHEELBASE*/  2.0/2.0)*rz);
+	lf = x -((/*WHEELBASE*/ 2.0/2.0)*rz);
 
-}
+	rf = ((rf+2.41)*FACTOR)+MINVALUE;
+	lf = ((lf+2.41)*FACTOR)+MINVALUE;
+	rf -= CORR;
+ 
+	if(rf < MINVALUE) rf = MINVALUE;
+	else if (rf > MAXVALUE) rf = MAXVALUE;
 
-void Platform::handle_ultrasoon(char* command)
-{
-	char* tmp;
-	int i = 0;
-	ROS_DEBUG_NAMED("xbeethread","handle_ultrasoon(\"%s\")",command);
-	if(READ_ENCODERS != atoi(strtok(command+1,",")))
-	{
-		ROS_DEBUG_NAMED("xbeethread","read message doesnt match send type");
-		return;
-	}
+	if(lf < MINVALUE) lf = MINVALUE;
+	else if (lf > MAXVALUE) lf = MAXVALUE;
 
-	tmp = strtok(NULL,",");
-	while(tmp != NULL && i < NR_ULTRASOON)
-	{
-		ussensor[i]=atoi(tmp);
-		i++;
-		tmp = strtok(NULL,",");
-	}
-	ROS_DEBUG_NAMED("xbeethread","encoders 0:%i 1:%i 2:%i 3:%i 4:%i 5:%i 6:%i 7:%i 8:%i 9:%i",
-					ussensor[0],ussensor[1],ussensor[2],ussensor[3],ussensor[4],ussensor[5],
-					ussensor[6],ussensor[7],ussensor[8],ussensor[9]);
+
+ 	*r =(int)rf;
+	*l =(int)lf;
 }
