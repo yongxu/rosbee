@@ -1,0 +1,8 @@
+ <menu xmlns:android="http://schemas.android.com/apk/res/android">
+        <item
+            android:id="@+id/EXIT_ITEM"
+            android:title="Exit"/>
+        <item
+            android:id="@+id/JoyStick_ITEM"
+            android:title="JoyStick Control"/>
+    </menu>
