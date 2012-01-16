@@ -3,6 +3,8 @@
 ==rosbeetf.cpp==
 _by Sven Rademakers_      3-Oct-2011
 
+<wiki:toc max_depth="3"/>
+
 *Note*: This document assumes familiarity with ROS and how to use it. Also knowledge about rviz and tf's.
 
 https://rosbee.googlecode.com/svn/wiki/rviz_screen.png
