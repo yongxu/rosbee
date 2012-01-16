@@ -3,16 +3,16 @@
 
 = Index =
 
-*[http://code.google.com/p/rosbee/wiki/Rosbee Rosbee]
+*[http://code.google.com/p/rosbee/wiki/Rosbee Home]
+
+*[http://code.google.com/p/rosbee/wiki/QuickGuide Quick Guide]
+
+*[http://code.google.com/p/rosbee/wiki/SetupGuide Setup]
 
 *[http://code.google.com/p/rosbee/wiki/Odometry Rosbee_Tf]
 
 *[http://code.google.com/p/rosbee/wiki/Rosbee_Control Rosbee_Control]
 
 *[http://code.google.com/p/rosbee/wiki/chrony Chrony]
-
-*[http://code.google.com/p/rosbee/wiki/QuickGuide Quick Guide]
-
-*[http://code.google.com/p/rosbee/wiki/SetupGuide Setup]
 
 *[http://code.google.com/p/rosbee/wiki/Recommendations Recommendations]
