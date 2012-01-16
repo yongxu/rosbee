@@ -4,7 +4,7 @@
 
 = Introduction =
 on this page we will try to explain the setup of the rosbee_control package and the move_platform node.
-the rosbee_control package contains the main launch files for the rosbee project. this includes the launch file for the robot and launch files for mapping and navigating on an existing map. it also contains the move_platform node, which is the node which provides the interface to the platform, allowing it to be controlled with cmd_vel messages and publishing encoder values for the odometry node.
+the rosbee_control package contains the main launch files for the rosbee project. this includes the launch file for the robot and launch files for mapping and navigating on an existing map. it also contains the move_platform node, which provides an interface to the platform, allowing it to be controlled with cmd_vel messages and publishing encoder values for the odometry node.
 
 = Launch files =
 the rosbee_control package contains the following launch files:
@@ -23,7 +23,7 @@ the line for the kinect is:
 <include file="$(find pointcloud_to_laserscan)/launch/kinext_laser_2.launch" />
 }}}
 
-to select the kinect or laser you will need to uncomment there lines. both the laser and kinect can be used at the same time.
+to select the kinect or laser you will need to uncomment there line in the launch file. 
 
 ===pc_launch.launch===
 pc_launch.launch runs everything from the navigation stack. but only works if you have a map of the area. (as it doesnt start the gmapping node).
