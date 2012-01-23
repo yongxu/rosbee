@@ -16,3 +16,10 @@
 *[http://code.google.com/p/rosbee/wiki/chrony Chrony]
 
 *[http://code.google.com/p/rosbee/wiki/Recommendations Recommendations]
+
+Useful Tools:
+*[http://www.ros.org/wiki/rviz/UserGuide RVIZ]
+
+*[http://www.ros.org/wiki/rxconsole rxconsole]
+
+*[http://www.ros.org/wiki/rxgraph rxgraph]
