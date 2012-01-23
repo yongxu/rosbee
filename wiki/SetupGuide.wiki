@@ -76,5 +76,9 @@ follow the same steps as with the netbook. Also we need to add an extra line to 
 {{{
 export ROS_MASTER_URI=http://192.168.1.146:11311
 }}}
+And don't forget to set an static ip in ubuntu. also make sure you set the ROS_IP parameter to that IP.
+
+you can repeat this step for each desktop you want to add to the ROS network.
+
 
 follow the instructions on the [http://code.google.com/p/rosbee/wiki/QuickGuide QuickGuide] to start the nodes.
