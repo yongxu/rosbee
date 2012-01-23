@@ -17,7 +17,8 @@
 
 *[http://code.google.com/p/rosbee/wiki/Recommendations Recommendations]
 
-Useful Tools:
+
+===Useful Tools===
 *[http://www.ros.org/wiki/rviz/UserGuide RVIZ]
 
 *[http://www.ros.org/wiki/rxconsole rxconsole]
