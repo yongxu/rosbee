@@ -26,9 +26,9 @@ more info is found at
 http://www.ros.org/wiki/navigation
 
 
-what we first did was to make sure that we can read encoder values from the paralax-board that is connected the the encoders.this specific code is implemented in the rosbee_control stack. 
+First we made sure that we can read encoder values from the paralax-board that is connected the the encoders.this specific code is implemented in the rosbee_control stack. 
 after the encoder values are obtained, we translate the incoming encoder-pulses to a distance. which we can calculate Odometry with.
-the last step is to publish some messages over ROS. If you look at the specification of the navigation stack, the move_base node to be exactly, you see that in order to get navigation working you need to publish 2 types of messages. a TF message and an Odomety message. 
+the last step is to publish some messages over ROS. If you look at the specification of the navigation stack, the move_base node to be precisely, you see that in order to get navigation working you need to publish 2 types of messages. a TF message and an Odomety message. 
 
 Node [/tfbroadcaster]
 Publications: 
@@ -41,7 +41,7 @@ Subscriptions:
  * /tf [tf/tfMessage]
 
 ===Read Encoders===
-to get information about encoders you first need to get the rosbee_control stack up and running. this stack publishes encoder values over ROS in the format descriped in rosbee_control/msg/encoders.msg. Because of some computing limitations of the paralax we only can publish encoder values at a rate of  max 10hz. another problem is if we sample at that rate the delta of the encoder pulses will be 0. this due a low resolution of the encoders on the wheel. below i have posted some code from the rosbee_tf source, i left the unimportant parts blank. 
+to get information about encoders you first need to get the rosbee_control stack up and running. this stack publishes encoder values over ROS in the format descriped in rosbee_control/msg/encoders.msg. Because of some computing limitations of the paralax we only can publish encoder values at a rate of  max 10hz. another problem is if we sample at 10 hz the delta of the encoder pulses will be 0. this due a low resolution of the encoders on the wheel. below i have posted some code from the rosbee_tf source, i left the unimportant parts blank. 
  
 {{{
 void enc(const rosbee_control::encoders::ConstPtr& msg)
@@ -133,8 +133,8 @@ double dtheta = (r-l)/WHEELBASE;
 ===Setting up an TF-Tree===
 
 first we needed a transform model of the robot,TF tree. a TF tree give us information about relative positions and rotations. as you probably know a tf tree is chain with transforms that have one parent but can have multiple child's. 
-in the picture above(rviz window) you see also an example of the tf tree of the rosbee robot.
-as you can see in the left panel an tree has only one topframe, in this case /map. the /map frame has 1 child /odom which has also an child /base_link. /base_link frame is an important frame.Most nodes use that frame. This frame mostly represents the center base point of the robot.We also have 2 wheel frames, a laser frame  and a kinect frame. 
+in the picture above(rviz window) you see an example of the tf tree of the rosbee robot.
+as you can see in the left panel an tree has only one topframe, in this case /map. the /map frame has 1 child /odom which has also an child /base_link. /base_link frame is an important frame. Most nodes use that frame. This frame mostly represents the center base point of the robot. We also have 2 wheel frames, a laser frame  and a kinect frame. 
 
 code wise it looks like this:
 {{{
