@@ -66,15 +66,13 @@ export ROS_IP=192.168.1.146
   * ssh
  tip: install openssh server on the netbook. this way you dont have to crouch for controlling the netbook.
 
-  * kinect or laser scanner
-  //TODO
 
 ===Hardware===
 
 there is nothing special about connecting the hardware to the netbook with usb. Only make sure that the paralax board is connected to the robot first. if you used other hardware or mounted components on a different position you may want to check if they match with the source code. if you open /rosbee_tf/src/rosbeetf.cpp you should see a couple defines. 
   
 ==Setting up the Desktop==
-follow the same steps as with the netbook. Also we need to add an extra line to our bashrc script. Because we need to know wich ROSsystem is the master. we decided that the netbook will be the ROS_MASTER. add the following extra line the your bashrc script:
+follow the same steps as with the netbook. Also we need to add an extra line to our bashrc script. Because we need to know wich ROS-system is the master. One of the pc's needs to be the master because we only can run one roscore. We decided that the netbook will be the ROS_MASTER. you could also make the other pc's master but then you need to change your ROS_MASTER_URI parameter in your bashscript. add the following extra line the your bashrc script:
 {{{
 export ROS_MASTER_URI=http://192.168.1.146:11311
 }}}
