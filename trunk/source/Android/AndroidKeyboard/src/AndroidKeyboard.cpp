@@ -63,7 +63,7 @@ class UDPServer
 		}
 		else
 		{
-			ROS_INFO("Connection Error!");
+			ROS_INFO("Connection Error!");	
 		}		
 	}
 
@@ -87,6 +87,7 @@ class UDPServer
 void  StringToValue(string s,double * x, double *y,double *z)
 {
 		ROS_INFO("Incoming:%s",s.c_str());
+		//todo
 }
 
 int main(int argc, char * argv[])
@@ -115,6 +116,9 @@ int main(int argc, char * argv[])
 	{
 		double x,y,z;
 		StringToValue(server.readLine(),&x,&y,&z);
+		cmd.linear.x = x;
+		cmd.linear.y = y;
+		cmd.linear.z = z;
 
 		//publish over ros
 		vel_pub.publish(cmd);
