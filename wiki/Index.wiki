@@ -17,6 +17,10 @@
 
 [http://code.google.com/p/rosbee/wiki/Recommendations Recommendations]
 
+[http://code.google.com/p/rosbee/wiki/Tf.pdf TF]
+
+[http://code.google.com/p/rosbee/wiki/Launch files.pdf Launch Files]
+
 
 ===Useful Tools===
 [http://www.ros.org/wiki/rviz/UserGuide RVIZ]
