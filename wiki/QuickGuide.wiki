@@ -19,7 +19,7 @@ make sure your network looks like this. 1 desktop pc also will do fine. The Only
 == Running Mapping/Navigation == 
   # power up the netbook / desktop pc(s)
   # flip the switch on the robot to "on 1" to turn on the platform.
-  # Open a terminal on the desktop-pc (Ctrl+Alt+T)
+  # Open a terminal on one of the the desktop pcs (Ctrl+Alt+T)
   # Run: 
 {{{
 ssh robot@192.168.1.146
