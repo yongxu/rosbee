@@ -1,5 +1,6 @@
 package ros.bee;
 
+
 import ros.Acellerometer.AccelerometerListener;
 import ros.Acellerometer.AccelerometerManager;
 import ros.UDP.UDPClient;
@@ -11,34 +12,45 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.TextView;
 
 public class RosbeeRemoteActivity extends Activity  implements AccelerometerListener {
 	
-	private UDPClient _client;
+	private static UDPClient _client;
 	private static Context CONTEXT;
 	private RecvThread _RecvThread;
-	private Thread _imgRecvThread;
 	private Img_RecvThread rt;
-	ImageView imgView;
+	private ImageView imgView;
+	private boolean running;
+	
+	private final int SteeringPort = 1234;
+	private final int ImagePort= 1337;
+	private final String IP = "192.168.1.151";
+	
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+       
+        running = false;
+        CONTEXT = this;       
         setContentView(R.layout.main);
-        CONTEXT = this;        
-        _client = UDPClient.GetInstance("192.168.1.185",1234); 
+      
+        _client = UDPClient.GetInstance("10.10.0.10",SteeringPort); 
+        imgView = (ImageView)findViewById(R.id.imgView);
+		imgView.setScaleType(ScaleType.FIT_XY);
         
-        _RecvThread = new RecvThread(_client.getSeverSock(),((TextView) findViewById(R.id.errorTextField)));
+		
+		//Error Thread
+        _RecvThread = new RecvThread(_client.getServerSock(),getContext());
 		_RecvThread.start();
 		
-		imgView = (ImageView)findViewById(R.id.imgView);
-		imgView.setScaleType(ScaleType.FIT_XY);
 		
-		rt = new Img_RecvThread("192.168.1.151", 1337, imgView, new Handler(){
+		//Image Thread
+		/*rt = new Img_RecvThread(IP, ImagePort, new Handler(){
 			
 			@Override
 			public void dispatchMessage(Message msg) {
@@ -47,12 +59,8 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 			}
 			
 		});
-		
-		_imgRecvThread = new Thread(rt);
-		_imgRecvThread.start();
-		
-      
-    }
+		rt.start(); */
+	}
     
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -60,33 +68,61 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	    inflater.inflate(R.layout.optionmenu, menu);
 	    return true;
 	}
-
+	
+	@Override public boolean onPrepareOptionsMenu(Menu menu) 
+	{
+		if(running)
+		menu.getItem(1).setTitle("Stop");
+		else
+		menu.getItem(1).setTitle("Start");	
+			return true;
+	}
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) 
+		{
+		case R.id.StartStop_ITEM:
+			if(running)
+				Stop();
+			else
+				Start();
+			break;
+		case R.id.EXIT_ITEM:
+			Stop();
+			this.finish();			
+			break;
+		}
+		return true;
+		}
+	
+	public void Start()
+	{
+		if(running == true)
+			return;
+		
+		running =true;
+		AccelerometerManager.startListening(this);
+	}
+	public void Stop()
+	{
+		if(running == false)
+			return;
+		
+		running = false;
+		AccelerometerManager.stopListening();
+	}
     public static Context getContext() {
                 return CONTEXT;
         }
-    
-	@Override
-	 protected void onResume() {
-	    	super.onResume();
-	    	if (AccelerometerManager.isSupported()) {
-	    		AccelerometerManager.startListening(this);
-	    	}
-	    }
-	
+   	
 	@Override 
 	    protected void onDestroy() {
 	    	super.onDestroy();
-	    	if (AccelerometerManager.isListening()) {
-	    		AccelerometerManager.stopListening();
-	    	}	    	
+	    	Stop();  	
 	    }
 	    
 	public void onAccelerationChanged(float x, float y, float z) {
 	
 		_client.sendUDPString(x+";"+y+";"+z);
-		/*((TextView) findViewById(R.id.x)).setText(String.valueOf(x));
-		((TextView) findViewById(R.id.y)).setText(String.valueOf(y));
-		((TextView) findViewById(R.id.z)).setText(String.valueOf(z));*/		
 	}
 	
 	private void UpdateImage(Bitmap bmp)

@@ -20,7 +20,7 @@
         android:id="@+id/z"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"/>  -->
+        android:text="TextView"/> 
 <LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
@@ -38,7 +38,7 @@
     	android:layout_height="fill_parent"
     	android:text="Stop" />
     	
-         </LinearLayout>
+         </LinearLayout>  -->
 	<ImageView 
 		android:id="@+id/imgView"
 		android:layout_width="fill_parent"
