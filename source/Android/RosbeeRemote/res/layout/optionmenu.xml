@@ -3,6 +3,6 @@
             android:id="@+id/EXIT_ITEM"
             android:title="Exit"/>
         <item
-            android:id="@+id/JoyStick_ITEM"
-            android:title="JoyStick Control"/>
+            android:id="@+id/StartStop_ITEM"
+            android:title="Start"/>
     </menu>

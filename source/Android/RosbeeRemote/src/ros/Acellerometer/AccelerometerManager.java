@@ -84,25 +84,16 @@ public class AccelerometerManager {
 		new SensorEventListener() {
 
 		private long now = 0;
-		private long timeDiff = 0;
 		private long lastUpdate = 0;
-		private long lastShake = 0;
-		
+	
 		private float x = 0;
 		private float y = 0;
 		private float z = 0;
-		private float lastX = 0;
-		private float lastY = 0;
-		private float lastZ = 0;
-		private float force = 0;
 		
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 		
 		public void onSensorChanged(SensorEvent event) {
-			// use the event timestamp as reference
-			// so the manager precision won't depends 
-			// on the AccelerometerListener implementation
-			// processing time
+			
 			now = event.timestamp;
 					
 			if(now - lastUpdate > pauze_ns)

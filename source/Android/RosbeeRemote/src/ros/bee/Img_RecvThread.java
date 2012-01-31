@@ -6,18 +6,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 
-import android.R.color;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Handler;
 import android.widget.ImageView;
 
-public class Img_RecvThread implements Runnable {
+public class Img_RecvThread extends Thread {
 	private DatagramSocket _socket;
-	private ImageView _imgview;
 	private int _port;
 	private InetAddress _ip;
 	private volatile Bitmap bmp;
@@ -28,7 +24,7 @@ public class Img_RecvThread implements Runnable {
 	private final int IMGWIDTH = 160;
 	private final int BUFFSIZE = IMGWIDTH * IMGHEIGHT * 3;
 	
-	public Img_RecvThread(String Ip, int port, ImageView view, Handler imghandler) {
+	public Img_RecvThread(String Ip, int port,Handler imghandler) {
 		try {
 			_socket = new DatagramSocket(port);
 			_ip = InetAddress.getByName(Ip);
@@ -42,7 +38,6 @@ public class Img_RecvThread implements Runnable {
 			e.printStackTrace();
 		}
 		bmp = Bitmap.createBitmap(IMGWIDTH,IMGHEIGHT,Bitmap.Config.ARGB_8888); 
-		_imgview = view;
 		
 	}
 

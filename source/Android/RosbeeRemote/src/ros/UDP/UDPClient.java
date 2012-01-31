@@ -22,7 +22,7 @@ public class UDPClient {
 	{ 
 		try 
 		{
-			System.out.println("udp geneuzel");
+		
 			IP = InetAddress.getByName(Ip);
 			PORT = port;
 			_sock = new DatagramSocket(port);
@@ -30,12 +30,12 @@ public class UDPClient {
 		} 
 		catch (Exception e) 
 		{
-			System.out.println("kennie connecten nie!");
+		
 			System.out.println(e.toString());
 			//toast.show();
 		}
 	}
-	public DatagramSocket getSeverSock()
+	public DatagramSocket getServerSock()
 	{
 		return _sock;
 		
@@ -66,33 +66,35 @@ public class UDPClient {
 		{			
 			DatagramPacket sendPacket = new DatagramPacket(buffer, BUFFERSIZE,IP,PORT);
 		    _sock.send(sendPacket);
-			//System.out.println(buffer.toString());
 		}
 		catch(Exception ex)
 		{
-			System.out.println("kennie senden nie!");
-			System.out.println(ex.toString());
+			//System.out.print("keiharde poep");
+			//System.out.println(ex.toString());
 		}
 	}
 	
 	public static String ReceiveUDP(DatagramSocket s)
 	{
+	
 		if(s == null)
 			return "" ;
 		
+	
 		byte[] buffer = new byte[BUFFERSIZE];
 		
 		try
 		{		
-		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE);
-	     s.receive(receivePacket);	        
+		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE,InetAddress.getByName("10.10.0.10"),1234);
+		 
+		   s.receive(receivePacket);	        
 		}
 		catch(Exception ex)
 		{
-			System.out.println("kennie recieven nie!");
+			System.out.println(ex.toString());
 		}
 		String str = new String(buffer);
-		str.trim();		
+		str =str.trim();		
 		 return str;
 	}
 
