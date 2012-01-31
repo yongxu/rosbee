@@ -16,7 +16,7 @@ import android.hardware.SensorManager;
 public class AccelerometerManager {
 	
 
-	private static int pauze_ns = 50000000;
+	private static int pauze_ns = 100000000;
 
 	private static Sensor sensor;
 	private static SensorManager sensorManager;

@@ -14,20 +14,18 @@ public class UDPClient {
 	private static UDPClient _client;
 	private DatagramSocket _sock;
 	private InetAddress IP;
-	private static final int BUFFERSIZE = 40;
+	private static final int BUFFERSIZE = 70;
 	private int PORT;
 	
-
 
 	private UDPClient(String Ip, int port)
 	{ 
 		try 
 		{
 			System.out.println("udp geneuzel");
-			_sock = new DatagramSocket();
 			IP = InetAddress.getByName(Ip);
 			PORT = port;
-			
+			_sock = new DatagramSocket(port);
 			  
 		} 
 		catch (Exception e) 
@@ -66,7 +64,7 @@ public class UDPClient {
 		
 		try
 		{			
-			DatagramPacket sendPacket = new DatagramPacket(buffer, BUFFERSIZE, IP, PORT);
+			DatagramPacket sendPacket = new DatagramPacket(buffer, BUFFERSIZE,IP,PORT);
 		    _sock.send(sendPacket);
 			//System.out.println(buffer.toString());
 		}
@@ -87,7 +85,7 @@ public class UDPClient {
 		try
 		{		
 		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE);
-	      s.receive(receivePacket);	        
+	     s.receive(receivePacket);	        
 		}
 		catch(Exception ex)
 		{
