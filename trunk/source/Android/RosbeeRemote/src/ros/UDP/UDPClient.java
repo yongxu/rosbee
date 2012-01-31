@@ -1,31 +1,47 @@
-package ros.bee;
+package ros.UDP;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
+
+import ros.bee.RecvThread;
+
+import android.widget.Toast;
 
 public class UDPClient {
 
 	private static UDPClient _client;
 	private DatagramSocket _sock;
 	private InetAddress IP;
-	private static final int BUFFERSIZE = 20;
+	private static final int BUFFERSIZE = 40;
 	private int PORT;
+	
+
 
 	private UDPClient(String Ip, int port)
 	{ 
 		try 
 		{
+			System.out.println("udp geneuzel");
 			_sock = new DatagramSocket();
 			IP = InetAddress.getByName(Ip);
 			PORT = port;
+			
+			  
 		} 
 		catch (Exception e) 
 		{
-
+			System.out.println("kennie connecten nie!");
+			System.out.println(e.toString());
+			//toast.show();
 		}
 	}
-	
+	public DatagramSocket getSeverSock()
+	{
+		return _sock;
+		
+	}
 	public void sendUDPString(String s)
 	{
 		if(_sock == null)
@@ -52,10 +68,12 @@ public class UDPClient {
 		{			
 			DatagramPacket sendPacket = new DatagramPacket(buffer, BUFFERSIZE, IP, PORT);
 		    _sock.send(sendPacket);
+			//System.out.println(buffer.toString());
 		}
 		catch(Exception ex)
 		{
-			
+			System.out.println("kennie senden nie!");
+			System.out.println(ex.toString());
 		}
 	}
 	
@@ -73,9 +91,11 @@ public class UDPClient {
 		}
 		catch(Exception ex)
 		{
-			
+			System.out.println("kennie recieven nie!");
 		}
-		 return buffer.toString().trim();
+		String str = new String(buffer);
+		str.trim();		
+		 return str;
 	}
 
 
@@ -91,5 +111,7 @@ public class UDPClient {
 	{
 		_sock.close();
 	}
+
+	
 	
 }
