@@ -43,16 +43,7 @@ class UDPServer
             	 return false;
 			 return true;
 	}
-/*
-	bool AcceptClient()
-	{
-		listen(sockfd,5);
-		clilen = sizeof(cli_addr);
-		newsockfd = accept(sockfd,(struct sockaddr *) &cli_addr,&clilen);
-		if (newsockfd < 0) 
-			return false;
-		return true;	
-	} */
+
     
    public:
 	UDPServer(int port)
@@ -139,6 +130,7 @@ void  StringToValue(string s,double * x, double *y,double *z)
 		{
 			*z=0.0;
 		}
+ROS_ERROR("DIT IS EEN VETTE ERROR!");
 
 
 
@@ -153,7 +145,7 @@ void logCallback(const rosgraph_msgs::Log::ConstPtr& msg)
 	if(msg->level == 8)
 	{
 		sendstring =(char *) msg->msg.c_str();
-		server->send(sendstring,sizeof(sendstring));
+		server->send(sendstring,msg->msg.length());
 	}
 
 
@@ -192,7 +184,6 @@ int main(int argc, char * argv[])
 		cmd.linear.x = cmd.linear.y = cmd.angular.z = 0;
 
 	}
-
 	
 	server->Close();
 	delete server;
