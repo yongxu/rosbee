@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.Toast;
 
 public class RosbeeRemoteActivity extends Activity  implements AccelerometerListener {
 	
@@ -24,6 +25,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	private Img_RecvThread rt;
 	private ImageView imgView;
 	private boolean running;
+	private String prev_string;
 	
 	private final int SteeringPort = 1234;
 	private final int ImagePort= 1337;
@@ -39,18 +41,25 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
         CONTEXT = this;       
         setContentView(R.layout.main);
       
-        _client = UDPClient.GetInstance("10.10.0.10",SteeringPort); 
+        prev_string ="";
+        _client = UDPClient.GetInstance(IP,SteeringPort); 
         imgView = (ImageView)findViewById(R.id.imgView);
 		imgView.setScaleType(ScaleType.FIT_XY);
         
 		
 		//Error Thread
-        _RecvThread = new RecvThread(_client.getServerSock(),getContext());
+        _RecvThread = new RecvThread(_client.getServerSock(),new Handler(){
+        	@Override
+			public void dispatchMessage(Message msg) {
+				RosbeeRemoteActivity.this.ToastError(_RecvThread.getReceivedMessage());
+				super.dispatchMessage(msg);
+			}
+        });
 		_RecvThread.start();
 		
 		
 		//Image Thread
-		/*rt = new Img_RecvThread(IP, ImagePort, new Handler(){
+		rt = new Img_RecvThread(IP, ImagePort, new Handler(){
 			
 			@Override
 			public void dispatchMessage(Message msg) {
@@ -59,7 +68,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 			}
 			
 		});
-		rt.start(); */
+		rt.start(); 
 	}
     
 	@Override
@@ -109,6 +118,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		
 		running = false;
 		AccelerometerManager.stopListening();
+		prev_string = "";
 	}
     public static Context getContext() {
                 return CONTEXT;
@@ -129,6 +139,15 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	{
 		imgView.setImageBitmap(bmp);
 	}
+	private void ToastError(String s)
+	{
+		if(!prev_string.equals(s))
+		{
+			Toast.makeText(this,s , Toast.LENGTH_LONG).show();
+			prev_string = s;
+		}
+	}
+	
 	
 
 }
