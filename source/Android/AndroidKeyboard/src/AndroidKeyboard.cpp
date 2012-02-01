@@ -130,7 +130,7 @@ void  StringToValue(string s,double * x, double *y,double *z)
 		{
 			*z=0.0;
 		}
-ROS_ERROR("DIT IS EEN VETTE ERROR!");
+		//ROS_ERROR("DIT IS EEN VETTE ERROR!");
 
 
 
