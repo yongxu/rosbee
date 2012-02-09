@@ -30,6 +30,8 @@ public class Img_RecvThread extends Thread {
 			_ip = InetAddress.getByName(Ip);
 			_port = port;
 			_imgHandler = imghandler;
+			
+			System.out.println("IP: " + _ip.toString() + " port: " + _port);
 		}
 		catch (SocketException e) {
 			System.out.println("socket exception!!!" + e.toString());

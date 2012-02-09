@@ -70,7 +70,7 @@ public class UDPClient {
 		catch(Exception ex)
 		{
 			//System.out.print("keiharde poep");
-			//System.out.println(ex.toString());
+			System.out.println(ex.toString());
 		}
 	}
 	
@@ -85,7 +85,7 @@ public class UDPClient {
 		
 		try
 		{		
-		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE,InetAddress.getByName("10.10.0.10"),1234);
+		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE,InetAddress.getByName("192.168.1.185"),1234);
 		 
 		   s.receive(receivePacket);	        
 		}
