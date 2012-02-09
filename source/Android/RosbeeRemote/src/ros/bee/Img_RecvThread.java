@@ -26,7 +26,7 @@ public class Img_RecvThread extends Thread {
 	private final int BUFFSIZE = IMGWIDTH * IMGHEIGHT * 3;
 	private final int SOCKTIMEOUT = 100; // timout for the socket in ms
 
-	public Img_RecvThreadread(String Ip, int port, Handler imghandler) {
+	public Img_RecvThread(String Ip, int port, Handler imghandler) {
 		try {
 			_socket = new DatagramSocket(port);
 			_ip = InetAddress.getByName(Ip);
