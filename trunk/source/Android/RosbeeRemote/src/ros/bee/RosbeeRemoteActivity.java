@@ -28,7 +28,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	private String prev_string;
 	
 	private final int SteeringPort = 1234;
-	private final int ImagePort= 1337;
+	private final int ImagePort= 12345;
 	private final String IP = "192.168.1.151";
 	
 	
@@ -42,7 +42,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
         setContentView(R.layout.main);
       
         prev_string ="";
-        _client = UDPClient.GetInstance(IP,SteeringPort); 
+        _client = UDPClient.GetInstance("192.168.1.185",SteeringPort); 
         imgView = (ImageView)findViewById(R.id.imgView);
 		imgView.setScaleType(ScaleType.FIT_XY);
         
@@ -63,12 +63,14 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 			
 			@Override
 			public void dispatchMessage(Message msg) {
+				System.out.println("dispatch");
 				RosbeeRemoteActivity.this.UpdateImage(rt.GetImage());
 				super.dispatchMessage(msg);
 			}
 			
 		});
-		rt.start(); 
+		rt.start();
+		
 	}
     
 	@Override
@@ -133,6 +135,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	public void onAccelerationChanged(float x, float y, float z) {
 	
 		_client.sendUDPString(x+";"+y+";"+z);
+		//System.out.println(x);
 	}
 	
 	private void UpdateImage(Bitmap bmp)
