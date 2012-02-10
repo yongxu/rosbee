@@ -29,7 +29,6 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	
 	private final int SteeringPort = 1234;
 	private final int ImagePort= 12345;
-	private final String IP = "192.168.1.151";
 	
 	
     /** Called when the activity is first created. */
@@ -59,7 +58,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		
 		
 		//Image Thread
-		rt = new Img_RecvThread(IP, ImagePort, new Handler(){
+		rt = new Img_RecvThread(ImagePort, new Handler(){
 			
 			@Override
 			public void dispatchMessage(Message msg) {

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -15,7 +13,6 @@ import android.os.Handler;
 public class Img_RecvThread extends Thread {
 	private DatagramSocket _socket;
 	private int _port;
-	private InetAddress _ip;
 	private volatile Bitmap bmp;
 	private volatile boolean run;
 
@@ -26,21 +23,17 @@ public class Img_RecvThread extends Thread {
 	private final int BUFFSIZE = IMGWIDTH * IMGHEIGHT * 3;
 	private final int SOCKTIMEOUT = 100; // timout for the socket in ms
 
-	public Img_RecvThread(String Ip, int port, Handler imghandler) {
+	public Img_RecvThread(int port, Handler imghandler) {
 		try {
 			_socket = new DatagramSocket(port);
-			_ip = InetAddress.getByName(Ip);
 			_port = port;
 			_imgHandler = imghandler;
 			_socket.setSoTimeout(SOCKTIMEOUT);
 			run = true;
 
-			System.out.println("IP: " + _ip.toString() + " port: " + _port);
+			System.out.println("port: " + _port);
 		} catch (SocketException e) {
 			System.out.println("socket exception!!!" + e.toString());
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		bmp = Bitmap.createBitmap(IMGWIDTH, IMGHEIGHT, Bitmap.Config.ARGB_8888);
 
