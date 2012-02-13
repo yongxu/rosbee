@@ -1,43 +1,44 @@
 package ros.bee;
 
-import android.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
+
 
 public class ConfigActivity extends  Activity{
-	Button submit;
-	Button cancel;
+
 	 @Override
 	    public void onCreate(Bundle savedInstanceState) {
-	        super.onCreate(savedInstanceState);
-	        
+	        super.onCreate(savedInstanceState);	        
 	        setContentView(ros.bee.R.layout.configmenu);
-	        
-	         submit = (Button) findViewById(ros.bee.R.id.btn_submit);
-	         cancel  = (Button) findViewById(ros.bee.R.id.btn_cancel);
-	        
-	        
-	         submit.setOnClickListener(new View.OnClickListener() {
-	            public void onClick(View view) {
-	                Intent intent = new Intent();
-	                setResult(RESULT_OK, intent);
-	                finish();
-	            }
-
-	        });
-	         
-	         cancel.setOnClickListener(new View.OnClickListener() {
-		            public void onClick(View view) {
-		                Intent intent = new Intent();
-		                setResult(RESULT_OK, intent);
-		                finish();
-		            }
-
-		        });
-	        
 	      
+	     ((EditText) findViewById(R.id.et_control_ip)).setText(getIntent().getStringExtra("IP")); 
+	    ((EditText) findViewById(R.id.et_img_port)).setText(getIntent().getStringExtra("IMAGEPORT")); 
+	    ((EditText) findViewById(R.id.et_control_port)).setText(getIntent().getStringExtra("CONTROLPORT")); 
 	 }
+	 public void submitClick(View v)
+		{
+		 String ip = ((EditText) findViewById(R.id.et_control_ip)).getText().toString();
+		 String imageport = ((EditText) findViewById(R.id.et_img_port)).getText().toString();
+		 String controlport = ((EditText) findViewById(R.id.et_control_port)).getText().toString();
+		 
+		 Intent intent = new Intent();
+		 intent.putExtra("IP", ip );
+		 intent.putExtra("IMAGEPORT", imageport );
+		 intent.putExtra("CONTROLPORT", controlport );
+		 
+         setResult(RESULT_OK, intent);
+         finish();
+		}
+		
+		public void CancelClick(View v)
+		{
+			Intent intent = new Intent();
+	         setResult(RESULT_CANCELED, intent);
+	         finish();
+		}
+		
 }

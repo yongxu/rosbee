@@ -1,19 +1,25 @@
 package ros.bee;
 
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+
 import ros.Acellerometer.AccelerometerListener;
 import ros.Acellerometer.AccelerometerManager;
 import ros.UDP.UDPClient;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.Toast;
@@ -28,8 +34,9 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	private boolean running;
 	private String prev_string;
 	
-	//private final int SteeringPort = 1234;
-	//private final int ImagePort= 12345;
+	private String IP;
+	private int image_port;
+	private int control_port;
 	
 	
     /** Called when the activity is first created. */
@@ -45,7 +52,13 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
         
         imgView = (ImageView)findViewById(R.id.imgView);
 		imgView.setScaleType(ScaleType.FIT_XY);
-        	
+		
+		IP = this.getResources().getString(R.string.default_ip_adress);
+		image_port = Integer.parseInt(this.getResources().getString(R.string.default_image_port));
+		control_port = Integer.parseInt(this.getResources().getString(R.string.default_control_port));
+		
+		
+	
 	}
     
 	@Override
@@ -76,14 +89,33 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 			Stop();
 			this.finish();			
 			break;
-		case R.id.Settings_ITEM:
-				Stop();			
-			
+		case R.id.Settings_ITEM:	
+			Stop();
+				 Intent myIntent = new Intent(RosbeeRemoteActivity.getContext(), ConfigActivity.class);
+				 myIntent.putExtra("IP",IP );
+				 myIntent.putExtra("IMAGEPORT",Integer.toString(image_port) );
+				 myIntent.putExtra("CONTROLPORT",Integer.toString(control_port));				 
+	                startActivityForResult(myIntent, 0);
 			break;
 		}
 		return true;
 		}
 	
+	public void onActivityResult(int requestCode, int resultCode,Intent data) {
+		
+		if(resultCode == RESULT_OK)
+		{
+			if(data.getStringExtra("IP") != null)
+		IP = data.getStringExtra("IP");
+			
+			if(data.getStringExtra("IMAGEPORT") != null)
+		image_port = Integer.parseInt(data.getStringExtra("IMAGEPORT"));
+			
+			if(data.getStringExtra("CONTROLPORT") != null)
+		control_port = Integer.parseInt(data.getStringExtra("CONTROLPORT"));
+					
+		}
+	}
 	public void Start()
 	{
 		if(running == true)
@@ -91,8 +123,9 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		
 		running =true;
 		
+				
+		_client = UDPClient.GetInstance(IP,control_port);
 		
-		_client = UDPClient.GetInstance(this.getResources().getString(R.string.ip_adress),Integer.parseInt(this.getResources().getString(R.string.control_port))); 
 		//Error Thread
         _RecvThread = new RecvThread(_client.getServerSock(),new Handler(){
         	@Override
@@ -105,7 +138,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		
 		
 		//Image Thread
-		rt = new Img_RecvThread(Integer.parseInt(this.getResources().getString(R.string.image_port)), new Handler(){
+		rt = new Img_RecvThread(image_port, new Handler(){
 			@Override
 			public void dispatchMessage(Message msg) {
 				System.out.println("dispatch");
@@ -118,6 +151,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		
 		AccelerometerManager.startListening(this);
 	}
+	
 	public void Stop()
 	{
 		if(running == false)
@@ -128,6 +162,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		prev_string = "";
 		
 		rt.StopThread();
+		_RecvThread.StopThread();
 		
 	}
     public static Context getContext() {

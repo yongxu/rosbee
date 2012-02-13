@@ -9,14 +9,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView android:paddingRight="15px" android:text="Image port:" android:layout_height="wrap_content" android:layout_width="wrap_content" />
-        <EditText android:id="@+id/et_img_port" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/image_port"/>
+        <EditText android:id="@+id/et_img_port" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text=""/>
     </LinearLayout>
     
     <LinearLayout android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView android:paddingRight="5px" android:text="Control port:" android:layout_height="wrap_content" android:layout_width="wrap_content" />
-        <EditText android:id="@+id/et_control_port" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/control_port"/>
+        <EditText android:id="@+id/et_control_port" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text=""/>
     </LinearLayout>
     
     
@@ -24,14 +24,14 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView android:paddingRight="24px" android:text="Control Ip:" android:layout_height="wrap_content" android:layout_width="wrap_content" />
-        <EditText android:id="@+id/et_control_ip" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="@string/ip_adress" />
+        <EditText android:id="@+id/et_control_ip" android:layout_height="wrap_content" android:layout_width="fill_parent" android:text="" />
     </LinearLayout>
     
         <LinearLayout android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-    <Button android:text="submit" android:id="@+id/btn_submit" android:layout_height="wrap_content" android:layout_width="200px" />
-    <Button android:text="Cancel" android:id="@+id/btn_cancel"  android:layout_height="wrap_content" android:layout_width="200px" />
+    <Button android:text="submit" android:id="@+id/btn_submit" android:layout_height="wrap_content" android:layout_width="200px"  android:onClick="submitClick"/>
+    <Button android:text="Cancel" android:id="@+id/btn_cancel"  android:layout_height="wrap_content" android:layout_width="200px" android:onClick="CancelClick" />
       </LinearLayout>
 
-</LinearLayout>
+</LinearLayout> 
