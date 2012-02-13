@@ -15,14 +15,15 @@ public class RecvThread extends Thread  {
 	private Handler _handler;
 	private volatile boolean run;
 	private final int SOCKTIMEOUT = 100;
-	
+	 private volatile boolean stopped;
+	 
 	public RecvThread(DatagramSocket sock, Handler handler)
 	{
 		_s = sock;	
 		_recv = "";
 		_handler = handler;
 		run = true;
-		
+		  stopped = false;
 		try
 		{
 		_s.setSoTimeout(SOCKTIMEOUT);
@@ -53,14 +54,16 @@ public class RecvThread extends Thread  {
 	
 			_handler.sendEmptyMessage(0);
 		}
+		stopped = true;
+		_s.close();
 	}
 	
 	boolean StopThread() {
 		run = false;
-		while(!run) //sleep until the thread ended
+		while(!stopped) //sleep until the thread ended
 		{
 			try {
-				sleep(10);
+				sleep(50);
 			} catch (InterruptedException e) {
 				return false;
 			}
