@@ -15,6 +15,7 @@ public class Img_RecvThread extends Thread {
 	private int _port;
 	private volatile Bitmap bmp;
 	private volatile boolean run;
+  private volatile boolean stopped;
 
 	private Handler _imgHandler;
 
@@ -30,6 +31,7 @@ public class Img_RecvThread extends Thread {
 			_imgHandler = imghandler;
 			_socket.setSoTimeout(SOCKTIMEOUT);
 			run = true;
+      stopped = false;
 
 			System.out.println("port: " + _port);
 		} catch (SocketException e) {
@@ -42,6 +44,9 @@ public class Img_RecvThread extends Thread {
 	public void run() {
 		byte[] buffer = new byte[BUFFSIZE];
 		boolean readed = true;
+    stopped = false;
+    run = true;
+    
 		while (run) {
 			readed = true;
 			try {
@@ -71,7 +76,7 @@ public class Img_RecvThread extends Thread {
 				_imgHandler.sendEmptyMessage(0);
 			}
 		}
-		run = true;
+		stopped = true;
 	}
 
 	Bitmap GetImage() {
@@ -80,7 +85,7 @@ public class Img_RecvThread extends Thread {
 
 	boolean StopThread() {
 		run = false;
-		while(!run) //sleep until the thread ended
+		while(!stopped) //sleep until the thread ended
 		{
 			try {
 				sleep(10);
