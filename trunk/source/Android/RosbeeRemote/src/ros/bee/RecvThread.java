@@ -2,10 +2,9 @@ package ros.bee;
 
 import java.net.DatagramSocket;
 
-import android.content.Context;
+
 import android.os.Handler;
-import android.widget.TextView;
-import android.widget.Toast;
+
 
 import ros.UDP.UDPClient;
 
