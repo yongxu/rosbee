@@ -161,8 +161,10 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		AccelerometerManager.stopListening();
 		prev_string = "";
 		
-		rt.StopThread();
-		_RecvThread.StopThread();
+		if(!rt.StopThread())
+			System.out.println("ajksfjkl;adslf;k");
+		if(!_RecvThread.StopThread())
+			System.out.println("ajksfjkl;adslf;k");
 		
 	}
     public static Context getContext() {
