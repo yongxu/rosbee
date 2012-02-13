@@ -13,12 +13,24 @@ public class RecvThread extends Thread  {
 	private DatagramSocket _s;
 	private String _recv;
 	private Handler _handler;
+	private volatile boolean run;
+	private final int SOCKTIMEOUT = 100;
 	
 	public RecvThread(DatagramSocket sock, Handler handler)
 	{
 		_s = sock;	
 		_recv = "";
 		_handler = handler;
+		run = true;
+		
+		try
+		{
+		_s.setSoTimeout(SOCKTIMEOUT);
+		}
+		catch(Exception ex)
+		{
+			
+		}
 	}
 	
 	public String getReceivedMessage()
@@ -27,7 +39,7 @@ public class RecvThread extends Thread  {
 	}
 	
 	public void run() {
-		while(true)
+		while(run)
 		{
 					
 			try
@@ -35,12 +47,25 @@ public class RecvThread extends Thread  {
 				_recv = (UDPClient.ReceiveUDP(_s));
 			}
 			catch (Exception e) {
-			System.out.println(e.toString());
+			//System.out.println(e.toString());
 			
 			}
 	
 			_handler.sendEmptyMessage(0);
 		}
+	}
+	
+	boolean StopThread() {
+		run = false;
+		while(!run) //sleep until the thread ended
+		{
+			try {
+				sleep(10);
+			} catch (InterruptedException e) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
