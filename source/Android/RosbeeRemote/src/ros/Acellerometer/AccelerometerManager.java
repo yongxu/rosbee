@@ -1,7 +1,6 @@
 package ros.Acellerometer;
 
-import java.security.Timestamp;
-import java.sql.Date;
+
 import java.util.List;
 
 import ros.bee.RosbeeRemoteActivity;

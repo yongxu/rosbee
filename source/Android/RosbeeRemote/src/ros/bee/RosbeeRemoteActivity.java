@@ -4,6 +4,7 @@ package ros.bee;
 import ros.Acellerometer.AccelerometerListener;
 import ros.Acellerometer.AccelerometerManager;
 import ros.UDP.UDPClient;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,8 +28,8 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	private boolean running;
 	private String prev_string;
 	
-	private final int SteeringPort = 1234;
-	private final int ImagePort= 12345;
+	//private final int SteeringPort = 1234;
+	//private final int ImagePort= 12345;
 	
 	
     /** Called when the activity is first created. */
@@ -41,35 +42,10 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
         setContentView(R.layout.main);
       
         prev_string ="";
-        _client = UDPClient.GetInstance("192.168.1.185",SteeringPort); 
+        
         imgView = (ImageView)findViewById(R.id.imgView);
 		imgView.setScaleType(ScaleType.FIT_XY);
-        
-		
-		//Error Thread
-        _RecvThread = new RecvThread(_client.getServerSock(),new Handler(){
-        	@Override
-			public void dispatchMessage(Message msg) {
-				RosbeeRemoteActivity.this.ToastError(_RecvThread.getReceivedMessage());
-				super.dispatchMessage(msg);
-			}
-        });
-		_RecvThread.start();
-		
-		
-		//Image Thread
-		rt = new Img_RecvThread(ImagePort, new Handler(){
-			
-			@Override
-			public void dispatchMessage(Message msg) {
-				System.out.println("dispatch");
-				RosbeeRemoteActivity.this.UpdateImage(rt.GetImage());
-				super.dispatchMessage(msg);
-			}
-			
-		});
-		rt.start();
-		
+        	
 	}
     
 	@Override
@@ -100,6 +76,10 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 			Stop();
 			this.finish();			
 			break;
+		case R.id.Settings_ITEM:
+				Stop();			
+			
+			break;
 		}
 		return true;
 		}
@@ -110,6 +90,32 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 			return;
 		
 		running =true;
+		
+		
+		_client = UDPClient.GetInstance(this.getResources().getString(R.string.ip_adress),Integer.parseInt(this.getResources().getString(R.string.control_port))); 
+		//Error Thread
+        _RecvThread = new RecvThread(_client.getServerSock(),new Handler(){
+        	@Override
+			public void dispatchMessage(Message msg) {
+				RosbeeRemoteActivity.this.ToastError(_RecvThread.getReceivedMessage());
+				super.dispatchMessage(msg);
+			}
+        });
+		_RecvThread.start();
+		
+		
+		//Image Thread
+		rt = new Img_RecvThread(Integer.parseInt(this.getResources().getString(R.string.image_port)), new Handler(){
+			@Override
+			public void dispatchMessage(Message msg) {
+				System.out.println("dispatch");
+				RosbeeRemoteActivity.this.UpdateImage(rt.GetImage());
+				super.dispatchMessage(msg);
+			}
+			
+		});
+		rt.start();
+		
 		AccelerometerManager.startListening(this);
 	}
 	public void Stop()
@@ -120,6 +126,9 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		running = false;
 		AccelerometerManager.stopListening();
 		prev_string = "";
+		
+		rt.StopThread();
+		
 	}
     public static Context getContext() {
                 return CONTEXT;

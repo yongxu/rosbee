@@ -3,5 +3,9 @@
 
     <string name="hello">Hello World, RosbeeRemoteActivity!</string>
     <string name="app_name">RosbeeRemote</string>
+    <string name="ip_adress">192.168.1.185</string>
+    <string name="image_port">12345</string>
+    <string name="control_port">1234</string>
+
 
 </resources>

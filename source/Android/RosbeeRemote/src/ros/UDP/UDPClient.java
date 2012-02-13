@@ -3,11 +3,8 @@ package ros.UDP;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.UnknownHostException;
 
-import ros.bee.RecvThread;
-
-import android.widget.Toast;
 
 public class UDPClient {
 
@@ -25,7 +22,7 @@ public class UDPClient {
 		
 			IP = InetAddress.getByName(Ip);
 			PORT = port;
-			_sock = new DatagramSocket(port);
+			_sock = new DatagramSocket(port,IP);
 			  
 		} 
 		catch (Exception e) 
@@ -39,6 +36,20 @@ public class UDPClient {
 	{
 		return _sock;
 		
+	}
+	
+	public void setPort(int port)
+	{
+		PORT = port;
+	}
+	public void SetIp(String ip)
+	{
+		try {
+			IP = InetAddress.getByName(ip);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public void sendUDPString(String s)
 	{
@@ -85,7 +96,7 @@ public class UDPClient {
 		
 		try
 		{		
-		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE,InetAddress.getByName("192.168.1.185"),1234);
+		 DatagramPacket receivePacket = new DatagramPacket(buffer,BUFFERSIZE);
 		 
 		   s.receive(receivePacket);	        
 		}
