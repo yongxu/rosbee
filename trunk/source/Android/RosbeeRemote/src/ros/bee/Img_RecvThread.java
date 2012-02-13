@@ -77,6 +77,7 @@ public class Img_RecvThread extends Thread {
 			}
 		}
 		stopped = true;
+		_socket.close();
 	}
 
 	Bitmap GetImage() {

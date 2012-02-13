@@ -8,14 +8,14 @@ import java.net.UnknownHostException;
 
 public class UDPClient {
 
-	private static UDPClient _client;
+	//private static UDPClient _client;
 	private DatagramSocket _sock;
 	private InetAddress IP;
 	private static final int BUFFERSIZE = 70;
 	private int PORT;
 	
 
-	private UDPClient(String Ip, int port)
+	public UDPClient(String Ip, int port)
 	{ 
 		try 
 		{
@@ -110,13 +110,7 @@ public class UDPClient {
 	}
 
 
-	public static UDPClient GetInstance(String ip, int Port)
-	{
-		if(_client == null)
-			_client = new  UDPClient(ip,Port);
-
-		return _client;
-	}
+	
 	
 	public void Close()
 	{

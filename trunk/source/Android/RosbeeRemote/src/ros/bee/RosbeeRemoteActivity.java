@@ -124,8 +124,9 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		running =true;
 		
 				
-		_client = UDPClient.GetInstance(IP,control_port);
+		_client =  new UDPClient(IP,control_port);
 		
+		/*
 		//Error Thread
         _RecvThread = new RecvThread(_client.getServerSock(),new Handler(){
         	@Override
@@ -134,7 +135,7 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 				super.dispatchMessage(msg);
 			}
         });
-		_RecvThread.start();
+		_RecvThread.start(); */
 		
 		
 		//Image Thread
@@ -161,10 +162,9 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 		AccelerometerManager.stopListening();
 		prev_string = "";
 		
-		if(!rt.StopThread())
-			System.out.println("ajksfjkl;adslf;k");
-		if(!_RecvThread.StopThread())
-			System.out.println("ajksfjkl;adslf;k");
+		rt.StopThread();		
+		//_RecvThread.StopThread();
+
 		
 	}
     public static Context getContext() {
@@ -179,8 +179,14 @@ public class RosbeeRemoteActivity extends Activity  implements AccelerometerList
 	    
 	public void onAccelerationChanged(float x, float y, float z) {
 	
+		try
+		{
 		_client.sendUDPString(x+";"+y+";"+z);
-		//System.out.println(x);
+		}
+		catch (Exception ex)
+		{
+			
+		}
 	}
 	
 	private void UpdateImage(Bitmap bmp)
