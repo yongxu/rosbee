@@ -35,7 +35,7 @@ roslaunch rosbee_control mapping_launch.launch
 }}} 
    you will see that other nodes will be loaded and rviz will pop up. it may take a few seconds before all the nodes are correctly loaded.
   #
-  # you can check if the connection between nodes are correct by  
+  # you can check if the connection between nodes are correct by using rxgraph  
   #  In Rviz make sure fixed frame is set to /map and Target frame is set to /base_link
   # On the left side of rviz you can check and uncheck different messages. 
   # press alt+tab to go back to the terminal, if you keep this terminal selected you are able to steer the rosbee robot. you may want to downsize the terminal to drive to robot and look at rviz at the same time.
