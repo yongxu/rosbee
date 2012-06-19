@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary the recommendations done for the next person on the project.
 
 = Recommendations =
 
