@@ -23,7 +23,7 @@
 
 [https://rosbee.googlecode.com/svn/wiki/Launch%20files.pdf Launch Files]
 
-[http://code.google.com/p/rosbee/wiki/RGBD_slam_with_octomap.docx 3d mapping]
+[http://rosbee.googlecode.com/svn/wiki/RGBD_slam_with_octomap.docx 3d mapping]
 
 
 ===Useful Tools===
