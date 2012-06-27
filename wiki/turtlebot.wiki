@@ -14,7 +14,8 @@ The installation of the packages needed for the things we used consists out of 3
 
 *§ 2.1	Installation turtlebot laptop*
 
-_2.1.1	Roomba/serial._
+_2.1.1	Roomba/serial_
+
 First thing we need to install are the roomba and serial communication stacks. 
 The serial stack: 
 
@@ -62,6 +63,7 @@ What u need to have on the main pc are the following things:
 -	And be able to set up a network connection between both pc’s (ssh)
 
 _2.2.2	Chrony_
+
 Now we also need to install chrony on the main pc to make sure both are running on the same time so there are no timeouts because of time difference.
 •  Install Chrony 
 sudo apt-get install chrony
