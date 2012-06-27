@@ -1,6 +1,6 @@
 #summary information about the turtlebot.
 
-= Introduction =
+= 1 Introduction =
 
 We have used the Turtlebot package on two things, the first is the simulation during the time we didn’t had a robot at our disposal to use for testing our code. This package used gazebo for simulation of the Turtlebot, and the Turtlebot simulation files. It worked well but that was because the output information was more detailed than we had from the RosBee that we used before. The second package that we use is the main information about the Turtlebot itself. This contains all the drivers for the USA version of the Turtlebot. Because we have an EU version we need a bit more than only the normal package. 
 
@@ -8,7 +8,7 @@ With the use of both of these packages we could test and update our code to work
 
 
 
-= installation =
+= 2 installation =
 
 The installation of the packages needed for the things we used consists out of 3 steps, installation of the laptop that is connected to the Turtlebot directly. The second is the installation on the desktop for the software to steer and visualize the output. And the final step it the installation of the simulation software, this one is last because it exist mostly of the packages used at step 2. 
 
@@ -123,7 +123,7 @@ sudo apt-get install ros-electric-turtlebot-simulator-desktop
 
 this will take a few minutes but after its done it is fully installed and ready for usage.
 
-= the simulation = 
+= 3 the simulation = 
 
 *§ 3.1	Simple simulation and driving*
 
@@ -170,7 +170,7 @@ this will bring up the gazebo with the world and the Turtlebot. Now we can drive
 
     rosrun rviz rviz -d `rospack find turtlebot_navigation`/nav_rviz.vcg
 
-= software = 
+= 4 software = 
 
 *§ 4.1	Basis*
 
@@ -253,3 +253,20 @@ it will start the program we need with the file we just saved. Now we need to la
 rosrun rviz rviz -d `rospack find turtlebot_navigation`/nav_rviz.vcg
 
 we need to set the robot to its place on the map, we have 2 steps for it. Click the "2D Pose Estimate" button. After that Click on the map where the TurtleBot is and drag in the direction the TurtleBot is pointing. This way we will see a arrow from the point the Turtlebot stands to the direction he is looking. Now we have the same setup as before and can navigate the robot the same way. 
+
+= 5 Links =
+
+http://ros.org/wiki/Robots/TurtleBot
+main turtlebot page, here u can find more about the installing and tutorials u have with the robot.
+
+http://www.ros.org/wiki/roomba_robot
+the page for the roomba package
+
+http://www.ros.org/wiki/serial_communication
+the page for the serial communication
+
+http://www.ros.org/wiki/simulator_gazebo
+the page for the simulator
+
+http://ros.org/wiki/turtlebot_simulator
+the page of the Turtlebot of the simulator
