@@ -14,7 +14,7 @@ The installation of the packages needed for the things we used consists out of 3
 
 *§ 2.1	Installation turtlebot laptop*
 
-_2.1.1	Roomba/serial_
+_2.1.1	Roomba/serial._
 First thing we need to install are the roomba and serial communication stacks. 
 The serial stack: 
 
