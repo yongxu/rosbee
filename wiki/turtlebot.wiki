@@ -59,35 +59,50 @@ _2.2.1	Checklist_
 What u need to have on the main pc are the following things: 
 
 -	A ROS installation of electric
+
 -	An ogre installation for visualization
+
 -	And be able to set up a network connection between both pc’s (ssh)
+
 
 _2.2.2	Chrony_
 
 Now we also need to install chrony on the main pc to make sure both are running on the same time so there are no timeouts because of time difference.
-•  Install Chrony 
+
+•  Install Chrony
+ 
 sudo apt-get install chrony
+
 •  manually sync NTP 
+
 sudo ntpdate ntp.ubuntu.com
+
 
 _2.2.3	Turtlebot + ssh_
 
 The last step to get the pc ready for communication between the pc and the laptop is installing ssh and the turtlebot files. It are the same commands as used before.
-• Update apt repos 
-sudo apt-get update
-• Install SSH to allow remote connections and update your TurtleBot software 
-	sudo apt-get install ssh ros-electric-turtlebot-robot
 
- 
+• Update apt repos 
+
+sudo apt-get update
+
+• Install SSH to allow remote connections and update your TurtleBot software 
+
+sudo apt-get install ssh ros-electric-turtlebot-robot
+
+
 *§ 2.3	Gazebo + Simulation turtlebot*
+
 _2.3.1	Installation (requires root access)_
 
 For more details on the installation check the following link: http://playerstage.sourceforge.net/doc/Gazebo-manual-svn-html/install.html 
 
 The things we did to install the package are as followed:
 
-$ tar xvzf gazebo-<version>.tar.gz
-$ cd gazebo-<version>
+$ tar xvzf gazebo-(version).tar.gz
+
+$ cd gazebo-(version)
+
 $ scons
 
 Note that scons will fail if any of the required packages are missing. Once Gazebo has been built, it can be installed: 
@@ -107,10 +122,3 @@ sudo apt-get update
 sudo apt-get install ros-electric-turtlebot-simulator-desktop
 
 this will take a few minutes but after its done it is fully installed and ready for usage.
-
-
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
