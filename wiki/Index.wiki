@@ -17,9 +17,13 @@
 
 [http://code.google.com/p/rosbee/wiki/Recommendations Recommendations]
 
+[http://code.google.com/p/rosbee/wiki/Turtlebot Turtlebot]
+
 [https://rosbee.googlecode.com/svn/wiki/Tf.pdf TF]
 
 [https://rosbee.googlecode.com/svn/wiki/Launch%20files.pdf Launch Files]
+
+[http://code.google.com/p/rosbee/wiki/RGBD%20slam%20with%20octomap.docx 3d mapping]
 
 
 ===Useful Tools===
