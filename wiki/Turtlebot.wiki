@@ -252,7 +252,7 @@ it will start the program we need with the file we just saved. Now we need to la
 
 rosrun rviz rviz -d `rospack find turtlebot_navigation`/nav_rviz.vcg
 
-we need to set the robot to its place on the map, we have 2 steps for it. Click the "2D Pose Estimate" button. After that Click on the map where the TurtleBot is and drag in the direction the TurtleBot is pointing. This way we will see a arrow from the point the Turtlebot stands to the direction he is looking. Now we have the same setup as before and can navigate the robot the same way. 
+we need to set the robot to its place on the map, we have 2 steps for it. Click the "2D Pose Estimate" button. After that Click on the map where the Turtlebot is and drag in the direction the Turtlebot is pointing. This way we will see a arrow from the point the Turtlebot stands to the direction he is looking. Now we have the same setup as before and can navigate the robot the same way. 
 
 = 5 Links =
 
