@@ -137,7 +137,9 @@ Note that scons will fail if any of the required packages are missing. Once Gaze
 $ su
 $ scons install
 $ exit
+}}}
 Gazebo is now ready to run; try: 
+{{{
 	$ gazebo /usr/local/share/gazebo/worlds/pioneer.world
 }}}
 
@@ -218,7 +220,9 @@ In the first terminal we give the command:
  Roscore
 }}}
 In the second terminal we give the command to start the roomba node: 
+{{{
 rosrun roomba_500_series roomba560_node
+}}}
 
 now we have the communication established between the laptop and the roomba we can start sending commands to the roomba.
 
