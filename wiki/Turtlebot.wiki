@@ -20,7 +20,7 @@ First thing we need to install are the roomba and serial communication stacks.
 The serial stack: 
 
 {{{
-Svn co http://isr-uc-ros-pkg.googlecode.com/svn/stacks/serial_communication/trunk serial
+svn co http://isr-uc-ros-pkg.googlecode.com/svn/stacks/serial_communication/trunk serial
 }}}
 
 This creates the map serial on its current location with the svn checkout of the link. When u open the map serial you use the command “make” to build the main files. Than u go into the map serial_port and use the “make” command again.
