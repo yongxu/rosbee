@@ -8,7 +8,7 @@ With the use of both of these packages we could test and update our code to work
 
 
 
-= 2 installation =
+= 2 Installation =
 
 The installation of the packages needed for the things we used consists out of 3 steps, installation of the laptop that is connected to the Turtlebot directly. The second is the installation on the desktop for the software to steer and visualize the output. And the final step it the installation of the simulation software, this one is last because it exist mostly of the packages used at step 2. 
 
@@ -23,7 +23,7 @@ The serial stack:
 Svn co http://isr-uc-ros-pkg.googlecode.com/svn/stacks/serial_communication/trunk serial
 }}}
 
-This creates the map serial on its current location with the svn checkout of the link. When u open the map serial u use the command “make” to build the main files. Than u go into the map cereal_port and use the “make” command again.
+This creates the map serial on its current location with the svn checkout of the link. When u open the map serial you use the command “make” to build the main files. Than u go into the map serial_port and use the “make” command again.
 
 The roomba stack: 
 
@@ -31,7 +31,7 @@ The roomba stack:
 svn co http://isr-uc-ros-pkg.googlecode.com/svn/stacks/roomba_robot/trunk roomba
 }}}
 
-this creates the map roomba on the current location with the svn checkout of the link. When u open the roomba map u give the command “make” to get the main build files. Then you go into the map roomba_500_series and do the command “make” again. This gives u the binary to run the communication program for communicating from the laptop to the roomba
+This creates the map roomba on the current location with the svn checkout of the link. When u open the roomba map you give the command “make” to get the main build files. Then you go into the map roomba_500_series and do the command “make” again. This gives u the binary to run the communication program for communicating from the laptop to the roomba
 
 _2.1.2	Turtlebot + ssh_
 
