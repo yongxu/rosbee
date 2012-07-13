@@ -21,9 +21,16 @@ The serial stack:
 
 {{{
 svn co http://isr-uc-ros-pkg.googlecode.com/svn/stacks/serial_communication/trunk serial
-}}}
 
-This creates the map serial on its current location with the svn checkout of the link. When u open the map serial you use the command “make” to build the main files. Than u go into the map serial_port and use the “make” command again.
+cd serial/cereal_port/ && make
+
+}}}
+<wiki:comment>
+Maybe use https://code.google.com/p/isr-uc-ros-pkg/downloads/detail?name=isr-uc-ros-pkg.rosinstall&can=2&q= instead?
+</wiki:comment>
+This downloads and builds [https://code.google.com/p/isr-uc-ros-pkg/ libcereal] from SVN.
+
+
 
 The roomba stack: 
 
